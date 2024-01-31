@@ -5,6 +5,7 @@ char reuseResponse = 'n';
 
 int main()
 {
+
 	float first = 0;
 	float second = 0;
 	char operand = '+';
@@ -79,7 +80,7 @@ int main()
 
 		
 
-		// prompt if user wants to exit
+		// prompt if user wants to reuse the result
 		std::cout << "Continue calculating with that result (y), or start from scratch (n)? " << std::endl;
 		std::cin >> reuseResponse;
 		while (reuseResponse != 'y' && reuseResponse != 'n') { // user has entered something that isn't y or n
