@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{94aaaebf-3619-4c1a-b76a-7960e2097159}</ProjectGuid>
-    <RootNamespace>ClassesPractice</RootNamespace>
+    <ProjectGuid>{d99e0655-5883-4a0b-9724-ac6f2086527e}</ProjectGuid>
+    <RootNamespace>StringClass</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -127,14 +127,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ClassesPractice.cpp" />
-    <ClCompile Include="Date.cpp" />
-    <ClCompile Include="Rectangle.cpp" />
+    <ClCompile Include="String.cpp" />
+    <ClCompile Include="StringClass.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Date.h" />
-    <ClInclude Include="DestructorPractice.h" />
-    <ClInclude Include="Rectangle.h" />
+    <ClInclude Include="String.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
