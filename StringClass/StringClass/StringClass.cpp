@@ -5,6 +5,6 @@
 int main()
 {
     String name;
-    std::cout << name;
+    std::cout << name.Length();
 }
 
