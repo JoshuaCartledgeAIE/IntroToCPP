@@ -5,6 +5,17 @@ using namespace std;
 
 int main()
 {
+    HelloWorld();
+
+
+    RunTests();
+}
+
+void HelloWorld() {
+
+}
+
+void RunTests() {
     // Test cases:
 
     // Testing constructors and CStr to print to console
