@@ -16,17 +16,20 @@ int main()
     cout << "test4: " << test4.CStr() << endl;
     cout << endl;
 
-    // Testing EqualTo
+    // Testing '+' operator
+    cout << "test + test2 + test3 + test: " << (test + test2 + test3 + test).CStr() << endl << endl;
+
+    // Testing EqualTo and '==' operator
     cout << "Is test1 equal to test2? " << test.EqualTo(test2) << endl;
-    cout << "Is test2 equal to test4? " << test2.EqualTo(test4) << endl;
+    cout << "Is test2 equal to test4? " << (test2 == test4) << endl;
     cout << endl;
 
-    // Testing Append and Prepend
+    // Testing Append and Prepend and the '+=' operator
     test.Append(test2);
     cout << "Append test2 onto test: " << test.CStr() << endl;
     test2.Prepend(test3);
     cout << "Prepend test3 onto test2: " << test2.CStr() << endl;
-    test3.Append(test3);
+    test3 += test3;
     cout << "Append test3 onto itself: " << test3.CStr() << endl;
     cout << endl;
 
@@ -39,10 +42,11 @@ int main()
     cout << "test5 in lowercase: " << test5.CStr() << endl;
     cout << endl;
 
-    // Testing CharacterAt and Find
+    // Testing CharacterAt, the '[]' operator and Find
     String test6("searchandyouwillfind");
     cout << "test6: " << test6.CStr() << endl;
     cout << "Character at index 4 in test6: " << test6.CharacterAt(4) << endl;
+    cout << "Character at index -2 in test6: " << test6[-2] << endl;
     cout << "Position of 'and' in test6: " << test6.Find(String("and")) << endl;
     cout << "Position of 'a' in test6: " << test6.Find(String("a")) << endl;
     cout << "Position of 'a' in test6 starting from index 4: " << test6.Find(4, String("a")) << endl;

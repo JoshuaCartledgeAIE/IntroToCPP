@@ -47,6 +47,14 @@ public:
 	// Returns a char pointer of the string stored in this object
 	const char * CStr() const;
 
+	// Operators
+	bool operator == (String& other);
+	bool operator != (String& other);
+	char& operator [] (int _index);
+	const char& operator [] (int _index) const;
+	String operator + (String& other);
+	void operator += (String& other);
+
 private:
 	char * m_string;
 

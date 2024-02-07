@@ -79,7 +79,7 @@ bool String::EqualTo(const String& _other) const
 
     // Loop through each char and compare in both strings
     for (int i = 0; i < Length(); i++) {
-        if (CStr()[i] != _other.CStr()[i]) {
+        if (CStr()[i] != _other[i]) {
             // One char does not match, therefore the strings are not identical, so return false
             return false;
         }
@@ -155,7 +155,7 @@ int String::Find(int _startIndex, const String& _str)
         bool found = true;
         // Loop through the substring and check each char to see if it matches
         for (int substringIndex = 0; substringIndex < _str.Length(); substringIndex++) {
-            if (m_string[searchIndex + substringIndex] != _str.CStr()[substringIndex]) {
+            if (m_string[searchIndex + substringIndex] != _str[substringIndex]) {
                 found = false;
                 break;
             }
@@ -172,6 +172,11 @@ int String::Find(int _startIndex, const String& _str)
 
 void String::Replace(const String& _find, const String& _replace)
 {
+    bool stillInstancesLeft = false;
+    while (stillInstancesLeft){
+        int foundIndex = Find(_find);
+        stillInstancesLeft = (foundIndex != -1); // keep finding and replacing while the target string remains inside this string
+    }
 
 }
 
@@ -188,6 +193,64 @@ void String::WriteToConsole()
 const char* String::CStr() const
 {
 	return m_string;
+}
+
+
+bool String::operator == (String& other)
+{
+    return EqualTo(other);
+}
+
+bool String::operator != (String& other)
+{
+    return EqualTo(other) == false;
+}
+
+char& String::operator [] (int _index)
+{
+    // check if magnitude of index is too big for the size of the string
+    if (_index >= Length() || -_index >= Length()) {
+        std::cout << "Out of bounds array index when attempting to access the string: '" << m_string << "' at index " << _index;
+        exit(0);
+    }
+    
+    // negative indexes start from the end of the string
+    if (_index < 0) {
+        return m_string[Length() + _index];
+    }
+    else {
+        return m_string[_index];
+    }
+    
+}
+
+const char& String::operator [] (int _index) const
+{
+    // check if magnitude of index is too big for the size of the string
+    if (_index >= Length() || -_index >= Length()) {
+        std::cout << "Out of bounds array index when attempting to access the string: '" << m_string << "' at index " << _index;
+        exit(0);
+    }
+
+    // negative indexes start from the end of the string
+    if (_index < 0) {
+        return m_string[Length() + _index];
+    }
+    else {
+        return m_string[_index];
+    }
+}
+
+String String::operator + (String& other)
+{
+    String temp(m_string);
+    temp.Append(other);
+    return temp;
+}
+
+void String::operator += (String& other)
+{
+    Append(other);
 }
 
 
