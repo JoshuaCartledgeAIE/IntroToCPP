@@ -15,8 +15,8 @@ public:
 	int Length() const;
 
 	// Returns the character at the given index in the string
-	/*char& CharacterAt(int _index);
-	const char& CharacterAt(int _index) const;*/
+	char& CharacterAt(int _index);
+	const char& CharacterAt(int _index) const;
 
 	// Returns true if both strings are identical, otherwise returns false
 	bool EqualTo(const String& _other) const;

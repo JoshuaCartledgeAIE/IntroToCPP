@@ -48,15 +48,27 @@ int String::Length() const
     return len;
 }
 
-//char& String::CharacterAt(int _index)
-//{
-//    // TODO: insert return statement here
-//}
-//
-//const char& String::CharacterAt(int _index) const
-//{
-//    // TODO: insert return statement here
-//}
+char& String::CharacterAt(int _index)
+{
+    // check if index is properly inside the bounds of the string
+    if (_index < 0 || _index >= Length()) {
+        return m_string[Length()]; // returns the null terminator at the end of the string
+    }
+
+    // Return the char at that index in the string
+    return m_string[_index];
+}
+
+const char& String::CharacterAt(int _index) const
+{
+    // check if index is properly inside the bounds of the string
+    if (_index < 0 || _index >= Length()) {
+        return '\0';
+    }
+
+    // Return the char at that index in the string
+    return m_string[_index];
+}
 
 bool String::EqualTo(const String& _other) const
 {
@@ -106,22 +118,56 @@ void String::Prepend(const String& _str)
 
 void String::ToLower()
 {
-
+    // Loop through each char and check if it is uppercase using its ASCII value (65-90)
+    for (int i = 0; i < Length(); i++) {
+        if (m_string[i] > 64 && m_string[i] < 91) {
+            // If uppercase, add 32 to the ASCII value to convert to lowercase
+            m_string[i] += 32;
+        }
+    }
 }
 
 void String::ToUpper()
 {
-
+    // Loop through each char and check if it is lowercase using its ASCII value (97-122)
+    for (int i = 0; i < Length(); i++) {
+        if (m_string[i] > 96 && m_string[i] < 122) {
+            // If lowercase, subtract 32 from the ASCII value to convert to uppercase
+            m_string[i] -= 32;
+        }
+    }
 }
 
 int String::Find(const String& _str)
 {
-    return 0;
+    return Find(0, _str);
 }
 
 int String::Find(int _startIndex, const String& _str)
 {
-    return 0;
+    // Check if find string is too long to be inside the search string
+    if (_str.Length() > (Length() - _startIndex)) {
+        return -1;
+    }
+
+    // Loop through each possible position for the substring, starting from the specified index
+    for (int searchIndex = _startIndex; searchIndex < Length() - _str.Length(); searchIndex++) {
+        bool found = true;
+        // Loop through the substring and check each char to see if it matches
+        for (int substringIndex = 0; substringIndex < _str.Length(); substringIndex++) {
+            if (m_string[searchIndex + substringIndex] != _str.CStr()[substringIndex]) {
+                found = false;
+                break;
+            }
+        }
+
+        if (found) {
+            return searchIndex;
+        }
+    }
+
+    // If func reaches this point, then there were no matches found, so return -1
+    return -1;
 }
 
 void String::Replace(const String& _find, const String& _replace)
