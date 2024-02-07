@@ -6,6 +6,8 @@ using namespace std;
 int main()
 {
     // Test cases:
+
+    // Testing constructors and CStr to print to console
     String test("one");
     String test2("two");
     String test3("three");
@@ -15,6 +17,9 @@ int main()
     cout << "test3: " << test3.CStr() << endl;
     cout << "test4: " << test4.CStr() << endl;
     cout << endl;
+
+    // Testing Length
+    cout << "Length of test3: " << test3.Length() << endl << endl;
 
     // Testing '+' operator
     cout << "test + test2 + test3 + test: " << (test + test2 + test3 + test).CStr() << endl << endl;
@@ -42,14 +47,16 @@ int main()
     cout << "test5 in lowercase: " << test5.CStr() << endl;
     cout << endl;
 
-    // Testing CharacterAt, the '[]' operator and Find
+    // Testing CharacterAt, the '[]' operator, Find and Substring
     String test6("searchandyouwillfind");
     cout << "test6: " << test6.CStr() << endl;
     cout << "Character at index 4 in test6: " << test6.CharacterAt(4) << endl;
     cout << "Character at index -2 in test6: " << test6[-2] << endl;
+
     cout << "Position of 'and' in test6: " << test6.Find(String("and")) << endl;
     cout << "Position of 'a' in test6: " << test6.Find(String("a")) << endl;
     cout << "Position of 'a' in test6 starting from index 4: " << test6.Find(4, String("a")) << endl;
+
     cout << "Substring of test6 from 2 to 6: " << test6.Substring(2, 6).CStr() << endl;
     cout << endl;
 
@@ -59,5 +66,25 @@ int main()
     test7.Replace(String("lots"), String("oodles"));
     cout << "Replace 'lots' with 'oodles' in test7: " << test7.CStr() << endl;
     cout << endl;
+
+    // Testing '<' and '>' operator
+    String test8("child");
+    String test9("chores");
+    String test10("children");
+    cout << "test8: " << test8.CStr() << endl;
+    cout << "test9: " << test9.CStr() << endl;
+    cout << "test10: " << test10.CStr() << endl;
+    cout << "test8 < test9: " << (test8 < test9) << endl;
+    cout << "test8 > test9: " << (test8 > test9) << endl;
+    cout << "test9 < test10: " << (test9 < test10) << endl;
+    cout << "test8 < test10: " << (test8 < test10) << endl;
+    cout << endl;
+
+    // Testing ReadFromConsole and WriteToConsole
+    String testinput("");
+    cout << "Enter a string (this will be repeated back to you): ";
+    testinput.ReadFromConsole();
+    cout << "You entered: ";
+    testinput.WriteToConsole();
 }
 

@@ -209,7 +209,10 @@ void String::Replace(const String& _find, const String& _replace)
 
 void String::ReadFromConsole()
 {
-    std::cin.getline(m_string, 150);
+    // Reallocate memory and get line of input
+    delete[] m_string;
+    m_string = new char[1000];
+    std::cin.getline(m_string, 1000);
 }
 
 void String::WriteToConsole()
@@ -231,6 +234,35 @@ bool String::operator == (String& other)
 bool String::operator != (String& other)
 {
     return EqualTo(other) == false;
+}
+
+bool String::operator < (String& other)
+{
+    if (EqualTo(other)) return false;
+
+    for (int i = 0; i < Length(); i++) {
+        if (other[i] == '\n') {
+            // other string is shorter than this one, therefore it goes before this string in the alphabet
+            return false;
+        }
+
+        if (m_string[i] < other[i]) {
+            return true;
+        }
+        else if (m_string[i] > other[i]) {
+            return false;
+        }
+        // otherwise the two letters are the same and so we move on to the next letter of both strings
+    }
+
+    // this string must be shorter than the other string, therefore it goes before the other string in the alphabet
+    return true;
+}
+
+bool String::operator > (String& other)
+{
+    return (*this < other == false);
+
 }
 
 char& String::operator [] (int _index)

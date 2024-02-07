@@ -9,7 +9,7 @@ public:
 	~String();
 
 public:
-	// String Utility Methods
+		// String Utility Methods
 
 	// Returns length of string
 	int Length() const;
@@ -50,16 +50,31 @@ public:
 	// Returns a char pointer of the string stored in this object
 	const char * CStr() const;
 
-	// Operators
+		// Operators
+
+	// Check if one string is identical to another
 	bool operator == (String& other);
+	// Check if one string is not identical to another
 	bool operator != (String& other);
+	// Check if one string comes before another in the alphabet
+	bool operator < (String& other);
+	// Check if one string comes after another in the alphabet
+	bool operator > (String& other);
+
+	// Access the character at the given index in the string
 	char& operator [] (int _index);
 	const char& operator [] (int _index) const;
+
+	// Concatenate two strings onto each other and return the result
 	String operator + (String& other);
+	// Concatenate the string onto this string, modifying this original string
 	void operator += (String& other);
 	void operator += (const String& other);
 
+	
+
 private:
+	// The char pointer to the char array (string) that this object holds
 	char * m_string;
 
 
