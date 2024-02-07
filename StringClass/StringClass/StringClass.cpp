@@ -50,6 +50,14 @@ int main()
     cout << "Position of 'and' in test6: " << test6.Find(String("and")) << endl;
     cout << "Position of 'a' in test6: " << test6.Find(String("a")) << endl;
     cout << "Position of 'a' in test6 starting from index 4: " << test6.Find(4, String("a")) << endl;
-    
+    cout << "Substring of test6 from 2 to 6: " << test6.Substring(2, 6).CStr() << endl;
+    cout << endl;
+
+    // Testing Replace
+    String test7("I like eating lots and lots of food");
+    cout << "test7: " << test7.CStr() << endl;
+    test7.Replace(String("lots"), String("oodles"));
+    cout << "Replace 'lots' with 'oodles' in test7: " << test7.CStr() << endl;
+    cout << endl;
 }
 

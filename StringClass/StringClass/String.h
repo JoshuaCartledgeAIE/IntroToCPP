@@ -36,6 +36,9 @@ public:
 	// Finds the specified substring from the start index, returns -1 if not present
 	int Find(int _startIndex, const String& _str);
 
+	// Returns a substring of the original string starting at startIndex (inclusive) and ending before endIndex (exclusive)
+	String Substring(int _startIndex, int _endIndex);
+
 	// Find the specified substring and replaces it with a string
 	void Replace(const String& _find, const String& _replace);
 	
@@ -54,6 +57,7 @@ public:
 	const char& operator [] (int _index) const;
 	String operator + (String& other);
 	void operator += (String& other);
+	void operator += (const String& other);
 
 private:
 	char * m_string;

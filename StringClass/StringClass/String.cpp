@@ -170,14 +170,41 @@ int String::Find(int _startIndex, const String& _str)
     return -1;
 }
 
+String String::Substring(int _startIndex, int _endIndex)
+{
+    // create temp array to store the substring
+    char * temp = new char[_endIndex - _startIndex + 1];
+
+    // set each char of temp
+    for (int i = _startIndex; i < _endIndex; i++) {
+        temp[i - _startIndex] = m_string[i];
+    }
+    temp[_endIndex - _startIndex] = '\0';
+
+    return String(temp);
+}
+
 void String::Replace(const String& _find, const String& _replace)
 {
     bool stillInstancesLeft = false;
+    // Check for an instance of the find string
+    int foundIndex = Find(_find);
+    stillInstancesLeft = (foundIndex != -1); // keep finding and replacing while the target string remains inside this string
     while (stillInstancesLeft){
-        int foundIndex = Find(_find);
+        // temp string becomes (start portion of OG string up to found substring) + (replace string) + (end portion of OG string)
+        String temp = Substring(0, foundIndex);
+        temp += _replace;
+        temp += Substring(foundIndex + _find.Length(), Length());
+
+        // Reallocate memory 
+        delete[] m_string;
+        m_string = new char[temp.Length() + 1];
+        strcpy_s(m_string, temp.Length() + 1, temp.CStr());
+
+        // Check for more instances of the find string
+        foundIndex = Find(_find);
         stillInstancesLeft = (foundIndex != -1); // keep finding and replacing while the target string remains inside this string
     }
-
 }
 
 void String::ReadFromConsole()
@@ -249,6 +276,10 @@ String String::operator + (String& other)
 }
 
 void String::operator += (String& other)
+{
+    Append(other);
+}
+void String::operator += (const String& other)
 {
     Append(other);
 }
