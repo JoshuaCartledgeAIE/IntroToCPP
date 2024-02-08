@@ -8,7 +8,8 @@ String::String()
 
 String::String(const char* _str)
 {
-    // I could use strcpy, but this is cooler
+    // I could use strcpy, but writing it from scratch is more fun, though probably less optimised
+
     m_string = new char[strlen(_str) + 1];
 
     // Loop through each char in the input string and assign it to the new string
@@ -40,6 +41,8 @@ String::~String()
 
 int String::Length() const
 {
+    // I could use strlen, but writing it from scratch is more fun, though probably less optimised
+
     int len = 0;
     // Loop through string and count length until null terminator is reached
     while (m_string[len] != '\0') {
@@ -151,7 +154,7 @@ int String::Find(int _startIndex, const String& _str)
     }
 
     // Loop through each possible position for the substring, starting from the specified index
-    for (int searchIndex = _startIndex; searchIndex < Length() - _str.Length(); searchIndex++) {
+    for (int searchIndex = _startIndex; searchIndex < Length() - _str.Length() + 1; searchIndex++) {
         bool found = true;
         // Loop through the substring and check each char to see if it matches
         for (int substringIndex = 0; substringIndex < _str.Length(); substringIndex++) {
@@ -172,6 +175,17 @@ int String::Find(int _startIndex, const String& _str)
 
 String String::Substring(int _startIndex, int _endIndex)
 {
+    // check that indices are inside the bounds
+    if (_startIndex < 0 || _endIndex > Length()) {
+        std::cout << "Substring error: out of bounds index!";
+        return String("");
+    }
+
+    if (_startIndex > _endIndex) {
+        std::cout << "Substring error: start index greater than end index!";
+        return String("");
+    }
+
     // create temp array to store the substring
     char * temp = new char[_endIndex - _startIndex + 1];
 
@@ -226,18 +240,34 @@ const char* String::CStr() const
 }
 
 
-bool String::operator == (String& other)
+void String::operator = (const String& other)
+{
+    // This is just the same code as the copy constructor above
+    m_string = new char[other.Length() + 1];
+
+    // Loop through each char in the input string and assign it to the new string
+    for (int i = 0; i < other.Length(); i++) {
+        m_string[i] = other.CStr()[i];
+    }
+
+    // Add null terminator to the end of the string
+    m_string[other.Length()] = '\0';
+}
+
+bool String::operator == (const String& other)
 {
     return EqualTo(other);
 }
 
-bool String::operator != (String& other)
+bool String::operator != (const String& other)
 {
     return EqualTo(other) == false;
 }
 
-bool String::operator < (String& other)
+bool String::operator < (const String& other)
 {
+    // I could use strcmp, but writing it from scratch is more fun, though probably less optimised
+
     if (EqualTo(other)) return false;
 
     for (int i = 0; i < Length(); i++) {
@@ -259,7 +289,7 @@ bool String::operator < (String& other)
     return true;
 }
 
-bool String::operator > (String& other)
+bool String::operator > (const String& other)
 {
     return (*this < other == false);
 
@@ -300,17 +330,13 @@ const char& String::operator [] (int _index) const
     }
 }
 
-String String::operator + (String& other)
+const String String::operator + (const String& other) const
 {
     String temp(m_string);
     temp.Append(other);
     return temp;
 }
 
-void String::operator += (String& other)
-{
-    Append(other);
-}
 void String::operator += (const String& other)
 {
     Append(other);

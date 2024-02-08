@@ -8,7 +8,6 @@ public:
 	String(const String& _other);
 	~String();
 
-public:
 		// String Utility Methods
 
 	// Returns length of string
@@ -52,25 +51,30 @@ public:
 
 		// Operators
 
+	// Assign lhs to rhs
+
+	void operator = (const String& other);
+
 	// Check if one string is identical to another
-	bool operator == (String& other);
+	bool operator == (const String& other);
 	// Check if one string is not identical to another
-	bool operator != (String& other);
+	bool operator != (const String& other);
 	// Check if one string comes before another in the alphabet
-	bool operator < (String& other);
+	bool operator < (const String& other);
 	// Check if one string comes after another in the alphabet
-	bool operator > (String& other);
+	bool operator > (const String& other);
 
 	// Access the character at the given index in the string
 	char& operator [] (int _index);
 	const char& operator [] (int _index) const;
 
 	// Concatenate two strings onto each other and return the result
-	String operator + (String& other);
+	const String operator + (const String& other) const;
 	// Concatenate the string onto this string, modifying this original string
-	void operator += (String& other);
 	void operator += (const String& other);
 
+	// Implicit conversion to char* (for cout purposes)
+	operator char* () { return m_string; };
 	
 
 private:
