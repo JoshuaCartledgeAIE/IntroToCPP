@@ -3,7 +3,7 @@
 
 String::String()
 {
-    m_string = new char[0];
+    m_string = new char[1];
 }
 
 String::String(const char* _str)
@@ -119,26 +119,44 @@ void String::Prepend(const String& _str)
     m_string = temp;
 }
 
-void String::ToLower()
+const String String::ToLower()
 {
+    // Make new dynamic char array with appropriate length
+    char * temp = new char[Length() + 1];
+    strcpy_s(temp, Length() + 1, m_string);
+
     // Loop through each char and check if it is uppercase using its ASCII value (65-90)
     for (int i = 0; i < Length(); i++) {
-        if (m_string[i] > 64 && m_string[i] < 91) {
+        if (temp[i] > 64 && temp[i] < 91) {
             // If uppercase, add 32 to the ASCII value to convert to lowercase
-            m_string[i] += 32;
+            temp[i] += 32;
         }
     }
+
+    // Convert to String
+    String tempString(temp);
+    delete[] temp;
+    return tempString;
 }
 
-void String::ToUpper()
+const String String::ToUpper()
 {
+    // Make new dynamic char array with appropriate length
+    char* temp = new char[Length() + 1];
+    strcpy_s(temp, Length() + 1, m_string);
+
     // Loop through each char and check if it is lowercase using its ASCII value (97-122)
     for (int i = 0; i < Length(); i++) {
-        if (m_string[i] > 96 && m_string[i] < 122) {
+        if (temp[i] > 96 && temp[i] < 122) {
             // If lowercase, subtract 32 from the ASCII value to convert to uppercase
-            m_string[i] -= 32;
+            temp[i] -= 32;
         }
     }
+
+    // Convert to String
+    String tempString(temp);
+    delete[] temp;
+    return tempString;
 }
 
 int String::Find(const String& _str)
@@ -225,8 +243,8 @@ void String::ReadFromConsole()
 {
     // Reallocate memory and get line of input
     delete[] m_string;
-    m_string = new char[1000];
-    std::cin.getline(m_string, 1000);
+    m_string = new char[10000];
+    std::cin.getline(m_string, 10000);
 }
 
 void String::WriteToConsole()

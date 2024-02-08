@@ -73,10 +73,8 @@ void RunTests() {
     // Testing ToUpper and ToLower
     String test5("!1!CaPiTaLisATIon!2!");
     cout << "test5: " << test5 << endl;
-    test5.ToUpper();
-    cout << "test5 in uppercase: " << test5 << endl;
-    test5.ToLower();
-    cout << "test5 in lowercase: " << test5 << endl;
+    cout << "test5 in uppercase: " << test5.ToUpper().CStr() << endl;
+    cout << "test5 in lowercase: " << test5.ToLower().CStr() << endl;
     cout << endl;
 
     // Testing CharacterAt and the '[]' operator

@@ -26,9 +26,9 @@ public:
 	void Prepend(const String& _str);
 
 	// Converts all letters in string to lowercase
-	void ToLower();
+	const String ToLower();
 	// Converts all letters in string to uppercase
-	void ToUpper();
+	const String ToUpper();
 
 	// Finds the specified substring, returns -1 if not present
 	int Find(const String& _str);
