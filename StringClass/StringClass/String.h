@@ -73,7 +73,7 @@ public:
 	// Concatenate the string onto this string, modifying this original string
 	void operator += (const String& other);
 
-	// Implicit conversion to char* (for cout purposes)
+	// Implicit conversion to char* (for cout purposes) Equivalent to CStr()
 	operator char* () { return m_string; };
 	
 
