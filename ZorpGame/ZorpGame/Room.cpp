@@ -2,14 +2,19 @@
 #include "GameDefines.h"
 #include <iostream>
 #include "Point2D.h"
+#include "Powerup.h"
+#include "Player.h"
+#include "String.h"
 
-Room::Room() : m_mapPosition{0, 0}, m_type{0}
+
+
+Room::Room() : m_mapPosition{0, 0}, m_type{0}, m_powerup{nullptr}
 {
 }
 
 Room::~Room()
 {
-
+	if (m_powerup != nullptr) delete m_powerup;
 }
 
 void Room::SetPosition(Point2D position)
@@ -20,6 +25,39 @@ void Room::SetPosition(Point2D position)
 void Room::SetType(int type)
 {
 	m_type = type;
+
+	// If it is not a treasure room, then abort early
+	if (!(type >= TREASURE_HP && type <= TREASURE_DF && m_powerup == nullptr)) {
+		return;
+	}
+	
+	// Otherwise, add a powerup to the room
+	String name = "";
+
+	float HP = 1;
+	float AT = 1;
+	float DF = 1;
+
+	// Choose type of item based on room type
+	switch (type) {
+	case TREASURE_HP:
+		name = "potion of ";
+		HP = 1.1f;
+		break;
+	case TREASURE_AT:
+		name = "sword of ";
+		AT = 1.1f;
+		break;
+	case TREASURE_DF:
+		name = "shield of ";
+		DF = 1.1f;
+		break;
+	}
+
+	// Pick random adjective modifier
+	int item = rand() % 15;
+	name.Append(itemNames[item]);
+	m_powerup = new Powerup(name, HP, AT, DF);
 }
 
 int Room::GetType()
@@ -91,7 +129,7 @@ void Room::DrawDescription()
 	}
 }
 
-bool Room::ExecuteCommand(int command)
+bool Room::ExecuteCommand(int command, Player* pPlayer)
 {
 	// position cursor correctly
 	std::cout << EXTRA_OUTPUT_POS;
@@ -118,6 +156,8 @@ bool Room::ExecuteCommand(int command)
 		std::cin.ignore(std::cin.rdbuf()->in_avail());
 		std::cin.get();
 		return true; 
+	case PICKUP:
+		return Pickup(pPlayer);
 	default:
 		// the direction was not valid,
 		// do nothing, go back to the top of the loop and ask again
@@ -129,4 +169,24 @@ bool Room::ExecuteCommand(int command)
 		break;
 	}
 	return false;
+}
+
+bool Room::Pickup(Player* pPlayer)
+{
+	// If it is not a treasure room or it is empty, then this fails
+	if (!(m_type >= TREASURE_HP && m_type <= TREASURE_DF) || m_powerup == nullptr) {
+		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "There is nothing here to pick up." << std::endl;
+		return true;
+	}
+	
+	// Add the powerup to the player's inventory
+	pPlayer->AddPowerup(m_powerup);
+
+	// Remove the powerup from this room
+	m_powerup = nullptr;
+
+	// Change room type to Empty
+	m_type = EMPTY;
+
+	return true;
 }

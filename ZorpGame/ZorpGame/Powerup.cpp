@@ -14,27 +14,8 @@ Powerup::~Powerup()
 {
 }
 
-String Powerup::getName()
-{
-	return m_name;
-}
 
-float Powerup::getHealthMultiplier()
+bool Powerup::Compare(Powerup* p1, Powerup* p2)
 {
-	return m_healthMultiplier;
-}
-
-float Powerup::getAttackMultiplier()
-{
-	return m_attackMultiplier;
-}
-
-float Powerup::getDefenceMultiplier()
-{
-	return m_defenceMultiplier;
-}
-
-bool Powerup::Compare(Powerup& p1, Powerup& p2)
-{
-	return p1.m_name < p2.m_name;
+	return p1->m_name < p2->m_name;
 }

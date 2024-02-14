@@ -6,6 +6,10 @@
 #include <time.h>
 #include <iostream>
 #include "String.h"
+#include "Enemy.h"
+#include "Powerup.h"
+#include "Food.h"
+
 
 Game::Game() : m_gameOver{false}
 {
@@ -13,11 +17,7 @@ Game::Game() : m_gameOver{false}
 
 Game::~Game()
 {
-	// Deallocate memory from nested array of rooms
-	for (int i = 0; i < MAZE_HEIGHT; i++) {
-		delete[] m_map[i];
-	}
-	delete[] m_map;
+
 }
 
 bool Game::Startup()
@@ -53,12 +53,17 @@ void Game::Update()
 
 	int command = GetCommand();
 
+	if (command == QUIT) {
+		m_gameOver = true;
+		return;
+	}
+
 	// If player is successfully able to execute this command (i.e. it is a move command), stop
-	if (m_player.ExecuteCommand(command, m_map[playerPos.y][playerPos.x].GetType()))
+	if (m_player.ExecuteCommand(command))
 		return;
 
 	// Otherwise, it might be a room specific command (i.e. look or fight), so execute it on the room
-	m_map[playerPos.y][playerPos.x].ExecuteCommand(command);
+	m_map[playerPos.y][playerPos.x].ExecuteCommand(command, &m_player);
 }
 
 void Game::Draw()
@@ -107,19 +112,9 @@ void Game::InitializeMap()
 {
 	srand(time(nullptr));
 
-	// Intitalize map rooms
+	// Intitalize map room positions
 	for (int y = 0; y < MAZE_HEIGHT; y++) {
 		for (int x = 0; x < MAZE_WIDTH; x++) {
-			int roomType = rand() % (MAX_RANDOM_TYPE * 2);
-			if (roomType >= MAX_RANDOM_TYPE) {
-				m_map[y][x].SetType(EMPTY);
-			}
-			else {
-				if (roomType == TREASURE) {
-					roomType = rand() % 3 + TREASURE_HP;
-				}
-				m_map[y][x].SetType(roomType);
-			}
 			m_map[y][x].SetPosition(Point2D{x, y});
 		}
 	}
@@ -127,6 +122,69 @@ void Game::InitializeMap()
 	// Initialize entrance and exit
 	m_map[0][0].SetType(ENTRANCE);
 	m_map[MAZE_HEIGHT - 1][MAZE_WIDTH - 1].SetType(EXIT);
+}
+
+void Game::InitializeEnemies()
+{
+	// Add a random number of enemies between 2 and 5
+	m_enemyCount = 2 + rand() % 3;
+	m_enemies = new Enemy[m_enemyCount];
+
+	for (int i = 0; i < m_enemyCount; i++) {
+		// spawn enemies at random position (not near entrance)
+		int x = 2 + (rand() % (MAZE_WIDTH - 3));
+		int y = 2 + (rand() % (MAZE_HEIGHT - 3));
+
+		// Tell the enemy its position and tell the room it contains an enemy
+		m_enemies[i].SetPosition(Point2D{ x, y });
+		m_map[y][x].SetEnemy(&m_enemies[i]);
+	}
+
+}
+
+void Game::InitializePowerups()
+{
+	// create some powerups
+	m_powerupCount = 3;
+	m_powerups = new Powerup[m_powerupCount];
+	// randomly place the food in the map
+	for (int i = 0; i < m_powerupCount; i++)
+	{
+		String name = "";
+		int x = rand() % (MAZE_WIDTH - 1);
+		int y = rand() % (MAZE_HEIGHT - 1);
+		switch (i) {
+		case 0:
+			name = "potion of ";
+			m_powerups[i].SetHealthMultiplier(1.1f);
+			break;
+		case 1:
+			name = "sword of ";
+			m_powerups[i].SetAttackMultiplier(1.1f);
+			break;
+		case 2:
+			name = "shield of ";
+			m_powerups[i].SetDefenceMultiplier(1.1f);
+			break;
+		}
+		name.Append(itemNames[(rand() % 15)]);
+		m_powerups[i].SetName(name);
+		m_map[y][x].SetPowerup(&m_powerups[i]);
+	}	
+}
+
+void Game::InitializeFood()
+{
+	// create some food
+	m_foodCount = 3;
+	m_food = new Food[m_foodCount];
+	// randomly place the food in the map
+	for (int i = 0; i < m_foodCount; i++)
+	{
+		int x = rand() % (MAZE_WIDTH - 1);
+		int y = rand() % (MAZE_HEIGHT - 1);
+		m_map[y][x].SetFood(&m_food[i]);
+	}
 }
 
 void Game::DrawWelcomeMessage()
@@ -212,6 +270,9 @@ int Game::GetCommand()
 	}
 	else if (inputCommand.Find("pickup") == 0) {
 		commandNo = PICKUP;
+	}
+	else if (inputCommand.Find("exit") == 0) {
+		commandNo = QUIT;
 	}
 
 	return commandNo;

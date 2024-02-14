@@ -3,6 +3,7 @@
 #include "Powerup.h"
 #include <vector>
 
+class Room;
 
 class Player {
 public:
@@ -11,20 +12,19 @@ public:
 	Player(Point2D position);
 	~Player();
 
+	void AddPowerup(Powerup* pUp);
+
 	void SetPosition(Point2D position);
 	Point2D GetPosition();
 
 	void Draw();
 
-	bool ExecuteCommand(int command, int roomType);
-
-private:
-	bool Pickup(int roomType);
+	bool ExecuteCommand(int command);
 
 private:
 	Point2D m_mapPosition;
 
-	std::vector<Powerup> m_powerups;
+	std::vector<Powerup*> m_powerups;
 
 	int m_healthPoints;
 	int m_attackPoints;

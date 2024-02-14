@@ -3,6 +3,10 @@
 #include "Room.h"
 #include "Player.h"
 
+class Enemy;
+class Food;
+class Powerup;
+
 class Game {
 public:
 	Game();
@@ -17,6 +21,9 @@ public:
 private:
 	bool EnableVirtualTerminal();
 	void InitializeMap();
+	void InitializeEnemies();
+	void InitializePowerups();
+	void InitializeFood();
 
 	void DrawWelcomeMessage();
 	void DrawMap();
@@ -25,7 +32,18 @@ private:
 
 private:
 	bool m_gameOver;
+
 	Room m_map[MAZE_HEIGHT][MAZE_WIDTH];
+
+	int m_enemyCount;
+	Enemy* m_enemies;
+
+	int m_foodCount;
+	Food* m_food;
+
+	int m_powerupCount;
+	Powerup* m_powerups;
+
 	Player m_player;
 };
 

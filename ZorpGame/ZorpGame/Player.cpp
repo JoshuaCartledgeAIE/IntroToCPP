@@ -4,6 +4,7 @@
 #include "Point2D.h"
 #include "String.h"
 #include <algorithm>
+#include "Room.h"
 
 Player::Player() : m_mapPosition{0, 0}, m_healthPoints{100}, m_attackPoints{20}, m_defendPoints{20}
 {
@@ -15,7 +16,17 @@ Player::Player(Point2D position) : m_mapPosition{position}, m_healthPoints{ 100 
 
 Player::~Player()
 {
+	for (auto iter = m_powerups.begin(); iter < m_powerups.end(); iter++) {
+		delete (*iter);
+	}
+	m_powerups.clear();
+}
 
+void Player::AddPowerup(Powerup* pUp)
+{
+	// Add new powerup to the array and sort it alphabetically
+	m_powerups.push_back(pUp);
+	std::sort(m_powerups.begin(), m_powerups.end(), Powerup::Compare);
 }
 
 void Player::SetPosition(Point2D position)
@@ -40,11 +51,11 @@ void Player::Draw()
 	std::cout << INVENTORY_OUTPUT_POS << CSI << "4M";
 	std::cout << INVENTORY_OUTPUT_POS <<"Inventory: ";
 	for (auto iter = m_powerups.begin(); iter < m_powerups.end(); iter++) {
-		std::cout << iter->getName() << "\t";
+		std::cout << (*iter)->GetName() << "\t";
 	}
 }
 
-bool Player::ExecuteCommand(int command, int roomType)
+bool Player::ExecuteCommand(int command)
 {
 	switch (command) {
 	case EAST:
@@ -67,53 +78,9 @@ bool Player::ExecuteCommand(int command, int roomType)
 			m_mapPosition.y++;
 		}
 		return true;
-	case PICKUP:
-		return Pickup(roomType);
 	}
+
 	return false;
 }
 
-bool Player::Pickup(int roomType)
-{
-	static const char itemNames[15][30] = {
-"indifference", "invisibility", "invulnerability", "incontinence",
-"improbability", "impatience", "indecision", "inspiration",
-"independence", "incurability", "integration", "invocation",
-"inferno", "indigestion", "inoculation"
-	};
 
-	// pick arbitrary descriptive name for item
-	int item = rand() % 15;
-	String name = "";
-
-	// pick random type for item
-	switch (roomType) {
-	case TREASURE_HP:
-		name = "potion of ";
-		break;
-	case TREASURE_AT:
-		name = "sword of ";
-		break;
-	case TREASURE_DF:
-		name = "shield of ";
-		break;
-	default:
-		return false;
-	}
-
-	name.Append(itemNames[item]);
-	std::cout << EXTRA_OUTPUT_POS << RESET_COLOR <<
-		"You pick up the " << name << std::endl;
-	
-	// Add item to player inventory
-	m_powerups.push_back(Powerup(name, 1.0f, 1.0f, 1.1f));
-
-	// Sort the player inventory
-	std::sort(m_powerups.begin(), m_powerups.end(), Powerup::Compare);
-
-	std::cout << INDENT << "Press 'Enter' to continue.";
-	std::cin.clear();
-	std::cin.ignore(std::cin.rdbuf()->in_avail());
-	std::cin.get();
-	return true;
-}
