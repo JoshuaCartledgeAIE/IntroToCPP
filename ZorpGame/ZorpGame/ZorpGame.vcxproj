@@ -129,6 +129,7 @@
   <ItemGroup>
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Powerup.cpp" />
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="String.cpp" />
     <ClCompile Include="ZorpGame.cpp" />
@@ -138,6 +139,7 @@
     <ClInclude Include="GameDefines.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Point2D.h" />
+    <ClInclude Include="Powerup.h" />
     <ClInclude Include="Room.h" />
     <ClInclude Include="String.h" />
   </ItemGroup>

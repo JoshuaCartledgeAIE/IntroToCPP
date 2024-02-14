@@ -54,7 +54,7 @@ void Game::Update()
 	int command = GetCommand();
 
 	// If player is successfully able to execute this command (i.e. it is a move command), stop
-	if (m_player.ExecuteCommand(command)) 
+	if (m_player.ExecuteCommand(command, m_map[playerPos.y][playerPos.x].GetType()))
 		return;
 
 	// Otherwise, it might be a room specific command (i.e. look or fight), so execute it on the room
@@ -115,6 +115,9 @@ void Game::InitializeMap()
 				m_map[y][x].SetType(EMPTY);
 			}
 			else {
+				if (roomType == TREASURE) {
+					roomType = rand() % 3 + TREASURE_HP;
+				}
 				m_map[y][x].SetType(roomType);
 			}
 			m_map[y][x].SetPosition(Point2D{x, y});
@@ -168,6 +171,9 @@ int Game::GetCommand()
 	std::cout << CSI << PLAYER_INPUT_Y << ";" << 0 << "H";
 	// clear any existing text
 	std::cout << CSI << "4M";
+	// insert 4 blank lines to ensure the inventory output remains correct
+	std::cout << CSI << "4L";
+
 	std::cout << INDENT << "Enter a command: ";
 	int commandNo = 0;
 	// move cursor to position for player to enter input
@@ -203,6 +209,9 @@ int Game::GetCommand()
 	}
 	else if (inputCommand.Find("fight") == 0) {
 		commandNo = FIGHT;
+	}
+	else if (inputCommand.Find("pickup") == 0) {
+		commandNo = PICKUP;
 	}
 
 	return commandNo;
