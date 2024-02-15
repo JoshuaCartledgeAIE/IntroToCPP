@@ -212,8 +212,9 @@ String String::Substring(int _startIndex, int _endIndex)
         temp[i - _startIndex] = m_string[i];
     }
     temp[_endIndex - _startIndex] = '\0';
-
-    return String(temp);
+    String tempString = temp;
+    delete[] temp;
+    return tempString;
 }
 
 void String::Replace(const String& _find, const String& _replace)

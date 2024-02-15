@@ -1,11 +1,15 @@
 #pragma once
 #include "Point2D.h"
 #include "Powerup.h"
+#include "GameDefines.h"
 #include <vector>
+#include "Character.h"
 
+class Powerup;
 class Room;
+class Enemy;
 
-class Player {
+class Player : public Character {
 public:
 
 	Player();
@@ -14,20 +18,24 @@ public:
 
 	void AddPowerup(Powerup* pUp);
 
-	void SetPosition(Point2D position);
-	Point2D GetPosition();
+	void SetPosition(const Point2D& position) { m_mapPosition = position;}
+	Point2D GetPosition() { return m_mapPosition; };
 
-	void Draw();
+	void Draw() override;
+	void DrawDescription() override;
+	void LookAt() override;
 
-	bool ExecuteCommand(int command);
+
+	void ExecuteCommand(int command, Room* pRoom);
 
 private:
-	Point2D m_mapPosition;
+	void Pickup(Room* pRoom);
+	void Attack(Enemy* pEnemy);
 
-	std::vector<Powerup*> m_powerups;
+private:
 
-	int m_healthPoints;
-	int m_attackPoints;
-	int m_defendPoints;
+	float m_maxHP = 100.0f;
+	const int BASE_AT = 20;
+	const int BASE_DF = 5;
 };
 

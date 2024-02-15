@@ -4,17 +4,20 @@
 #include "Point2D.h"
 #include "Powerup.h"
 #include "Player.h"
+#include "Food.h"
 #include "String.h"
+#include "GameObject.h"
+#include "Enemy.h"
+#include <algorithm>
 
 
-
-Room::Room() : m_mapPosition{0, 0}, m_type{0}, m_powerup{nullptr}
+Room::Room() : m_mapPosition{0, 0}, m_type{EMPTY}
 {
 }
 
 Room::~Room()
 {
-	if (m_powerup != nullptr) delete m_powerup;
+
 }
 
 void Room::SetPosition(Point2D position)
@@ -22,47 +25,22 @@ void Room::SetPosition(Point2D position)
 	m_mapPosition = position;
 }
 
-void Room::SetType(int type)
+void Room::AddGameObject(GameObject* object)
 {
-	m_type = type;
-
-	// If it is not a treasure room, then abort early
-	if (!(type >= TREASURE_HP && type <= TREASURE_DF && m_powerup == nullptr)) {
-		return;
-	}
-	
-	// Otherwise, add a powerup to the room
-	String name = "";
-
-	float HP = 1;
-	float AT = 1;
-	float DF = 1;
-
-	// Choose type of item based on room type
-	switch (type) {
-	case TREASURE_HP:
-		name = "potion of ";
-		HP = 1.1f;
-		break;
-	case TREASURE_AT:
-		name = "sword of ";
-		AT = 1.1f;
-		break;
-	case TREASURE_DF:
-		name = "shield of ";
-		DF = 1.1f;
-		break;
-	}
-
-	// Pick random adjective modifier
-	int item = rand() % 15;
-	name.Append(itemNames[item]);
-	m_powerup = new Powerup(name, HP, AT, DF);
+	// Add object to the room and sort objects by priority
+	m_objects.push_back(object);
+	std::sort(m_objects.begin(), m_objects.end(), GameObject::Compare);
 }
 
-int Room::GetType()
+void Room::RemoveGameObject(GameObject* object)
 {
-	return m_type;
+	// loop through objects in room until target object is found, then remove it
+	for (auto it = m_objects.begin(); it != m_objects.end(); it++) {
+		if (*it == object) {
+			m_objects.erase(it);
+			return;
+		}
+	}
 }
 
 void Room::Draw()
@@ -71,26 +49,24 @@ void Room::Draw()
 	Point2D outPos = { INDENT_X + (6 * m_mapPosition.x) + 1,  MAP_Y + m_mapPosition.y };
 	// jump to the correct location
 	std::cout << CSI << outPos.y << ";" << outPos.x << "H" << RESET_COLOR;
-	// draw the room
+	
+	// draw the room based on its type/contents
 	switch (m_type) {
 	case EMPTY:
-		std::cout << "[ " << GREEN << "\xb0" << RESET_COLOR << " ] ";
-		break;
-	case ENEMY:
-		std::cout << "[ " << RED << "\x94" << RESET_COLOR << " ] ";
-		break;
-	case TREASURE_HP:
-	case TREASURE_AT:
-	case TREASURE_DF:
-		std::cout << "[ " << YELLOW << "$" << RESET_COLOR << " ] ";
-		break;
-	case FOOD:
-		std::cout << "[ " << WHITE << "\xcf" << RESET_COLOR << " ] ";
+		if (m_objects.size() > 0) {
+			m_objects[0]->Draw();
+		}
+		else {
+			// empty room
+			std::cout << "[ " << GREEN << "\xb0" << RESET_COLOR << " ] ";
+		}
 		break;
 	case ENTRANCE:
+		// entrance
 		std::cout << "[ " << WHITE << "\x9d" << RESET_COLOR << " ] ";
 		break;
 	case EXIT:
+		// exit
 		std::cout << "[ " << WHITE << "\xFE" << RESET_COLOR << " ] ";
 		break;
 	}
@@ -107,18 +83,13 @@ void Room::DrawDescription()
 	// write description of current room
 	switch (m_type) {
 	case EMPTY:
-		std::cout << INDENT << "You are in an empty meadow. There is nothing of note here." << std::endl;
-		break;
-	case ENEMY:
-		std::cout << INDENT << RED << "BEWARE." << RESET_COLOR << " An enemy is approaching." << std::endl;
-		break;
-	case TREASURE_HP:
-	case TREASURE_AT:
-	case TREASURE_DF:
-		std::cout << INDENT << "There appears to be some treasure here. Perhaps you should investigate futher." << std::endl;
-		break;
-	case FOOD:
-		std::cout << INDENT << "At last! You collect some food to sustain you on your journey." << std::endl;
+		if (m_objects.size() > 0) {
+			m_objects[0]->DrawDescription();
+		}
+		else {
+			// empty room
+			std::cout << INDENT << "You are in an empty meadow. There is nothing of note here." << std::endl;
+		}
 		break;
 	case ENTRANCE:
 		std::cout << INDENT << "The entrance you used to enter this maze is blocked.There is no going back." << std::endl;
@@ -129,64 +100,42 @@ void Room::DrawDescription()
 	}
 }
 
-bool Room::ExecuteCommand(int command, Player* pPlayer)
+void Room::LookAt()
 {
-	// position cursor correctly
-	std::cout << EXTRA_OUTPUT_POS;
-
-	switch(command){
-	case LOOK:
-		// Display different message if there is treasure present
-		if (m_type >= TREASURE_HP && m_type <= TREASURE_DF) {
-			std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "There is some treasure here. It looks small enough to pick up." << std::endl;
-		}
-		else {
-			std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You look around, but see nothing worth mentioning." << std::endl;
-		}
-		
-		std::cout << INDENT << "Press 'Enter' to continue.";
-		std::cin.clear();
-		std::cin.ignore(std::cin.rdbuf()->in_avail());
-		std::cin.get();
-		return true;
-	case FIGHT:
-		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You could try to fight, but you don't have a weapon." << std::endl;
-		std::cout << INDENT << "Press 'Enter' to continue.";
-		std::cin.clear();
-		std::cin.ignore(std::cin.rdbuf()->in_avail());
-		std::cin.get();
-		return true; 
-	case PICKUP:
-		return Pickup(pPlayer);
-	default:
-		// the direction was not valid,
-		// do nothing, go back to the top of the loop and ask again
-		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You try, but you just can't do it." << std::endl;
-		std::cout << INDENT << "Press 'Enter' to continue.";
-		std::cin.clear();
-		std::cin.ignore(std::cin.rdbuf()->in_avail());
-		std::cin.get();
-		break;
+	if (m_objects.size() > 0) {
+		m_objects[0]->LookAt();
 	}
-	return false;
+	else {
+		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You look around, but see nothing worth mentioning" << std::endl;
+	}
 }
 
-bool Room::Pickup(Player* pPlayer)
+Enemy* Room::GetEnemy()
 {
-	// If it is not a treasure room or it is empty, then this fails
-	if (!(m_type >= TREASURE_HP && m_type <= TREASURE_DF) || m_powerup == nullptr) {
-		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "There is nothing here to pick up." << std::endl;
-		return true;
+	for (GameObject* obj : m_objects) {
+		Enemy* enemy = dynamic_cast<Enemy*>(obj);
+		if (enemy != nullptr)
+			return enemy;
 	}
-	
-	// Add the powerup to the player's inventory
-	pPlayer->AddPowerup(m_powerup);
+	return nullptr;
+}
 
-	// Remove the powerup from this room
-	m_powerup = nullptr;
+Powerup* Room::GetPowerup()
+{
+	for (GameObject* obj : m_objects) {
+		Powerup* powerup = dynamic_cast<Powerup*>(obj);
+		if (powerup != nullptr)
+			return powerup;
+	}
+	return nullptr;
+}
 
-	// Change room type to Empty
-	m_type = EMPTY;
-
-	return true;
+Food* Room::GetFood()
+{
+	for (GameObject* obj : m_objects) {
+		Food* food = dynamic_cast<Food*>(obj);
+		if (food != nullptr)
+			return food;
+	}
+	return nullptr;
 }

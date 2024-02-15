@@ -1,11 +1,18 @@
 #pragma once
-class Food
+#include "GameObject.h"
+
+class Food : public GameObject
 {
 public:
-	Food() : m_healthPoints{ 10 } {}
+	Food();
+	Food(Point2D position);
 	~Food() {}
 
-	int getHP() { return m_healthPoints; }
+	int GetHP() { return m_healthPoints; }
+
+	void Draw() override;
+	void DrawDescription() override;
+	void LookAt() override;
 
 private:
 	int m_healthPoints;

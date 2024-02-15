@@ -1,7 +1,8 @@
 #pragma once
 #include "String.h"
+#include "GameObject.h"
 
-class Powerup
+class Powerup : public GameObject
 {
 public:
 	Powerup();
@@ -19,6 +20,10 @@ public:
 	void SetDefenceMultiplier(float value) { m_defenceMultiplier = value; }
 
 	static bool Compare(Powerup* p1, Powerup* p2);
+
+	void Draw() override;
+	void DrawDescription() override;
+	void LookAt() override;
 
 private:
 	String m_name;

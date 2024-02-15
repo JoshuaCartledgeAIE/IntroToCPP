@@ -17,7 +17,9 @@ Game::Game() : m_gameOver{false}
 
 Game::~Game()
 {
-
+	delete[] m_powerups;
+	delete[] m_enemies;
+	delete[] m_food;
 }
 
 bool Game::Startup()
@@ -29,8 +31,13 @@ bool Game::Startup()
 		return false;
 	}
 
+	srand(time(nullptr));
+
 	// Initialise map grid with random rooms
 	InitializeMap();
+	InitializeEnemies();
+	InitializeFood();
+	InitializePowerups();
 
 	// Set player to start pos
 	m_player.SetPosition(Point2D{ 0,0 });
@@ -58,12 +65,16 @@ void Game::Update()
 		return;
 	}
 
-	// If player is successfully able to execute this command (i.e. it is a move command), stop
-	if (m_player.ExecuteCommand(command))
-		return;
-
-	// Otherwise, it might be a room specific command (i.e. look or fight), so execute it on the room
-	m_map[playerPos.y][playerPos.x].ExecuteCommand(command, &m_player);
+	// Execute the command
+	m_player.ExecuteCommand(command, &m_map[playerPos.y][playerPos.x]);
+	
+	// If there are any dead enemies, remove them from their room
+	for (int i = 0; i < m_enemyCount; i++) {
+		if (m_enemies[i].IsAlive() == false) {
+			Point2D enemyPos = m_enemies[i].GetPosition();
+			m_map[enemyPos.y][enemyPos.x].RemoveGameObject(&m_enemies[i]);
+		}
+	}
 }
 
 void Game::Draw()
@@ -110,7 +121,6 @@ bool Game::EnableVirtualTerminal()
 
 void Game::InitializeMap()
 {
-	srand(time(nullptr));
 
 	// Intitalize map room positions
 	for (int y = 0; y < MAZE_HEIGHT; y++) {
@@ -126,8 +136,8 @@ void Game::InitializeMap()
 
 void Game::InitializeEnemies()
 {
-	// Add a random number of enemies between 2 and 5
-	m_enemyCount = 2 + rand() % 3;
+	// Add a random number of enemies between 5 and 8
+	m_enemyCount = 5 + rand() % 3;
 	m_enemies = new Enemy[m_enemyCount];
 
 	for (int i = 0; i < m_enemyCount; i++) {
@@ -137,7 +147,7 @@ void Game::InitializeEnemies()
 
 		// Tell the enemy its position and tell the room it contains an enemy
 		m_enemies[i].SetPosition(Point2D{ x, y });
-		m_map[y][x].SetEnemy(&m_enemies[i]);
+		m_map[y][x].AddGameObject(&m_enemies[i]);
 	}
 
 }
@@ -169,21 +179,21 @@ void Game::InitializePowerups()
 		}
 		name.Append(itemNames[(rand() % 15)]);
 		m_powerups[i].SetName(name);
-		m_map[y][x].SetPowerup(&m_powerups[i]);
+		m_map[y][x].AddGameObject(&m_powerups[i]);
 	}	
 }
 
 void Game::InitializeFood()
 {
 	// create some food
-	m_foodCount = 3;
+	m_foodCount = 4;
 	m_food = new Food[m_foodCount];
 	// randomly place the food in the map
 	for (int i = 0; i < m_foodCount; i++)
 	{
 		int x = rand() % (MAZE_WIDTH - 1);
 		int y = rand() % (MAZE_HEIGHT - 1);
-		m_map[y][x].SetFood(&m_food[i]);
+		m_map[y][x].AddGameObject(&m_food[i]);
 	}
 }
 
@@ -228,9 +238,9 @@ int Game::GetCommand()
 	// jump to the correct location
 	std::cout << CSI << PLAYER_INPUT_Y << ";" << 0 << "H";
 	// clear any existing text
-	std::cout << CSI << "4M";
-	// insert 4 blank lines to ensure the inventory output remains correct
-	std::cout << CSI << "4L";
+	std::cout << CSI << "5M";
+	// insert 5 blank lines to ensure the inventory output remains correct
+	std::cout << CSI << "5L";
 
 	std::cout << INDENT << "Enter a command: ";
 	int commandNo = 0;
@@ -243,37 +253,53 @@ int Game::GetCommand()
 	String inputCommand;
 	// Read from console and convert to lowercase
 	inputCommand.ReadFromConsole();
-	inputCommand = inputCommand.ToLower();
 
-	// Determine which command has been entered
-	if (inputCommand.Find("move") == 0) {
-		// Move command has a direction afterward
-		if (inputCommand.Find(4, "north") != -1) {
-			commandNo = NORTH;
+	// Move command has a direction afterward
+	if (inputCommand.Find("W") == 0) {
+		commandNo = NORTH;
+	}
+	else if (inputCommand.Find("S") == 0) {
+		commandNo = SOUTH;
+	}
+	else if (inputCommand.Find("A") == 0) {
+		commandNo = WEST;
+	}
+	else if (inputCommand.Find("D") == 0) {
+		commandNo = EAST;
+	}
+	else {
+		inputCommand = inputCommand.ToLower();
+		// Determine which command has been entered
+		if (inputCommand.Find("move") == 0) {
+			// Move command has a direction afterward
+			if (inputCommand.Find(4, "north") != -1) {
+				commandNo = NORTH;
+			}
+			else if (inputCommand.Find(4, "south") != -1) {
+				commandNo = SOUTH;
+			}
+			else if (inputCommand.Find(4, "west") != -1) {
+				commandNo = WEST;
+			}
+			else if (inputCommand.Find(4, "east") != -1) {
+				commandNo = EAST;
+			}
+			else return -1; // Invalid direction word
 		}
-		else if (inputCommand.Find(4, "south") != -1) {
-			commandNo = SOUTH;
+		else if (inputCommand.Find("look") == 0) {
+			commandNo = LOOK;
 		}
-		else if (inputCommand.Find(4, "west") != -1) {
-			commandNo = WEST;
+		else if (inputCommand.Find("fight") == 0) {
+			commandNo = FIGHT;
 		}
-		else if (inputCommand.Find(4, "east") != -1) {
-			commandNo = EAST;
+		else if (inputCommand.Find("pickup") == 0) {
+			commandNo = PICKUP;
 		}
-		else return -1; // Invalid direction word
+		else if (inputCommand.Find("exit") == 0) {
+			commandNo = QUIT;
+		}
 	}
-	else if (inputCommand.Find("look") == 0) {
-		commandNo = LOOK;
-	}
-	else if (inputCommand.Find("fight") == 0) {
-		commandNo = FIGHT;
-	}
-	else if (inputCommand.Find("pickup") == 0) {
-		commandNo = PICKUP;
-	}
-	else if (inputCommand.Find("exit") == 0) {
-		commandNo = QUIT;
-	}
+	
 
 	return commandNo;
 }

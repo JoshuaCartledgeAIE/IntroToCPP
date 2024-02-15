@@ -1,29 +1,19 @@
 #pragma once
-#include "Point2d.h";
+#include "Point2d.h"
+#include "Character.h"
 
-class Enemy
+class Enemy : public Character
 {
 public:
-	Enemy() : m_healthPoints{ 20 }, m_attackPoints{ 10 }, m_defendPoints{ 5 } {}
+	Enemy();
 	~Enemy() {};
 
-	void SetPosition(const Point2D& position) { m_mapPosition = position; }
-	Point2D getPosition() { return m_mapPosition; };
 
-	int getHP() { return m_healthPoints; }
-	int getAT() { return m_attackPoints; }
-	int getDF() { return m_defendPoints; }
+	void OnAttacked(int attackPoints);
 
-	bool isAlive() { return (m_healthPoints > 0); }
-
-	void onAttacked(int attackPoints);
-
-private:
-	Point2D m_mapPosition;
-
-	int m_healthPoints;
-	int m_attackPoints;
-	int m_defendPoints;
+	void Draw() override;
+	void DrawDescription() override;
+	void LookAt() override;
 
 };
 

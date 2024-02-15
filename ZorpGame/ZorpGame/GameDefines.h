@@ -14,6 +14,7 @@ const char* const RESET_COLOR = "\x1b[0m";
 const char* const EXTRA_OUTPUT_POS = "\x1b[21;6H";
 const char* const INVENTORY_OUTPUT_POS = "\x1b[24;6H";
 
+// room types
 const int EMPTY = 0;
 const int ENTRANCE = EMPTY + 1;
 const int EXIT = ENTRANCE + 1;
@@ -21,6 +22,7 @@ const int EXIT = ENTRANCE + 1;
 const int MAZE_WIDTH = 10;
 const int MAZE_HEIGHT = 6;
 
+// screen positions
 const int INDENT_X = 5;
 const int ROOM_DESC_Y = 8;
 const int MOVEMENT_DESC_Y = 9;
@@ -39,9 +41,17 @@ const int FIGHT = 10;
 const int PICKUP = 11;
 const int QUIT = 12;
 
+// Adjectives for item names
 static const char itemNames[15][30] = {
 "indifference", "invisibility", "invulnerability", "incontinence",
 "improbability", "impatience", "indecision", "inspiration",
 "independence", "incurability", "integration", "invocation",
 "inferno", "indigestion", "inoculation"
 };
+
+// Priority Values
+const int PRIORITY_DEFAULT = 5;
+const int PRIORITY_PLAYER = 0;
+const int PRIORITY_ENEMY = 1;
+const int PRIORITY_POWERUP = 2;
+const int PRIORITY_FOOD = 3;
