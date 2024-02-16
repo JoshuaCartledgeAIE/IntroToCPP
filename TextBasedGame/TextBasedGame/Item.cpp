@@ -31,7 +31,7 @@ bool Item::Compare(Item* p1, Item* p2)
 
 void Item::Draw()
 {
-	std::cout << "[ " << YELLOW << "$" << RESET_COLOR << " ] ";
+	std::cout << "[" << YELLOW << "$" << RESET_COLOR << "]  ";
 }
 
 void Item::DrawDescription()

@@ -1,10 +1,11 @@
 #include "Room.h"
+#include "Room.h"
 #include "GameDefines.h"
 #include <iostream>
 #include "Point2D.h"
-#include "Powerup.h"
+#include "Item.h"
 #include "Player.h"
-#include "Food.h"
+
 #include "String.h"
 #include "GameObject.h"
 #include "Enemy.h"
@@ -120,22 +121,13 @@ Enemy* Room::GetEnemy()
 	return nullptr;
 }
 
-Powerup* Room::GetPowerup()
+Item* Room::GetItem()
 {
-	for (GameObject* obj : m_objects) {
-		Powerup* powerup = dynamic_cast<Powerup*>(obj);
-		if (powerup != nullptr)
-			return powerup;
-	}
-	return nullptr;
-}
-
-Food* Room::GetFood()
-{
-	for (GameObject* obj : m_objects) {
-		Food* food = dynamic_cast<Food*>(obj);
-		if (food != nullptr)
-			return food;
+	for (GameObject* obj : m_objects) 
+	{
+		Item* item = dynamic_cast<Item*>(obj);
+		if (item != nullptr)
+			return item;
 	}
 	return nullptr;
 }

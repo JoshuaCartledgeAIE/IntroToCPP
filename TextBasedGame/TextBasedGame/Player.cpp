@@ -51,9 +51,13 @@ void Player::AddItem(Item* pUp)
 
 void Player::Draw()
 {
-	Point2D outPos = { INDENT_X + (6 * m_mapPosition.x) + 3,  MAP_Y + m_mapPosition.y };
+	// Draw stats at top of screen
+	std::cout << STATS_OUTPUT_POS << "HP: " << (int)m_healthPoints << "/" << (int)m_maxHP
+		<< "    Attack: " << (int)m_attackPoints << "     Defense: " << (int)m_defendPoints;
+
+	Point2D outPos = { INDENT_X + (5 * m_mapPosition.x) + 2,  MAP_Y + (m_mapPosition.y * 2) };
 	// draw the player's position on the map
-	// move cursor to map pos and delete character at current position
+	// move cursor to map pos and delete character at current position, replace it with player
 	std::cout << CSI << outPos.y << ";" << outPos.x << "H";
 	std::cout << MAGENTA << "\x81" << RESET_COLOR;
 
@@ -63,8 +67,7 @@ void Player::Draw()
 	for (auto iter = m_Items.begin(); iter < m_Items.end(); iter++) {
 		std::cout << (*iter)->GetName() << "\t";
 	}
-	std::cout << std::endl << INDENT << "HP: " << (int)m_healthPoints << "/" << (int)m_maxHP
-		<< "    Attack: " << (int)m_attackPoints << "     Defense: " << (int)m_defendPoints;
+	
 }
 
 void Player::DrawDescription()
@@ -133,20 +136,6 @@ void Player::Pickup(Room* pRoom)
 
 		// Clear Item from room
 		pRoom->RemoveGameObject(Item);
-	}
-	// check if food exists in room
-	else if (pRoom->GetFood() != nullptr) {
-		Food* food = pRoom->GetFood();
-
-		// Eat the food and increase health
-		m_healthPoints += food->GetHP();
-		if (m_healthPoints > m_maxHP) m_healthPoints = m_maxHP;
-
-		// Tell user that they ate food, and their new resulting health
-		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You eat the tasty food. Your health is now " << m_healthPoints << std::endl;
-
-		// Clear food from room
-		pRoom->RemoveGameObject(food);
 	}
 	else {
 		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "There is nothing here to pick up." << std::endl;

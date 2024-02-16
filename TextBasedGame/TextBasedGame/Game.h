@@ -23,11 +23,13 @@ private:
 	void InitializeMap();
 	void InitializeEnemies();
 	void InitializeItems();
-	void InitializeFood();
+	
+	void GenerateTransitions();
 
 	void DrawWelcomeMessage();
 	void DrawMap();
 	void DrawValidDirections();
+
 	int GetCommand();
 
 private:

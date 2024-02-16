@@ -8,7 +8,7 @@
 #include "String.h"
 #include "Enemy.h"
 #include "Item.h"
-
+#include <vector>
 
 
 Game::Game() : m_gameOver{false}
@@ -36,7 +36,6 @@ bool Game::Startup()
 	// Initialise map grid with random rooms
 	InitializeMap();
 	InitializeEnemies();
-	InitializeFood();
 	InitializeItems();
 
 	// Set player to start pos
@@ -116,18 +115,23 @@ bool Game::EnableVirtualTerminal()
 	{
 		return false;
 	}
+
+	std::cout << CSI << "8;" << WINDOW_HEIGHT << ";" << WINDOW_WIDTH << "t";
+
 	return true;
 }
 
 void Game::InitializeMap()
 {
-
 	// Intitalize map room positions
 	for (int y = 0; y < MAZE_HEIGHT; y++) {
 		for (int x = 0; x < MAZE_WIDTH; x++) {
 			m_map[y][x].SetPosition(Point2D{x, y});
 		}
 	}
+
+	// Add random transitions to rooms
+	GenerateTransitions();
 
 	// Initialize entrance and exit
 	m_map[0][0].SetType(ENTRANCE);
@@ -136,8 +140,8 @@ void Game::InitializeMap()
 
 void Game::InitializeEnemies()
 {
-	// Add a random number of enemies between 5 and 8
-	m_enemyCount = 5 + rand() % 3;
+	// Add a random number of enemies between 8 and 10
+	m_enemyCount = 8 + rand() % 3;
 	m_enemies = new Enemy[m_enemyCount];
 
 	for (int i = 0; i < m_enemyCount; i++) {
@@ -155,7 +159,7 @@ void Game::InitializeEnemies()
 void Game::InitializeItems()
 {
 	// create some Items
-	m_ItemCount = 3;
+	m_ItemCount = 7;
 	m_Items = new Item[m_ItemCount];
 	// randomly place the food in the map
 	for (int i = 0; i < m_ItemCount; i++)
@@ -163,7 +167,7 @@ void Game::InitializeItems()
 		String name = "";
 		int x = rand() % (MAZE_WIDTH - 1);
 		int y = rand() % (MAZE_HEIGHT - 1);
-		switch (i) {
+		switch (rand() % 3) {
 		case 0:
 			name = "potion of ";
 			m_Items[i].SetHealthMultiplier(1.1f);
@@ -183,25 +187,16 @@ void Game::InitializeItems()
 	}	
 }
 
-void Game::InitializeFood()
+void Game::GenerateTransitions()
 {
-	// create some food
-	m_foodCount = 4;
-	m_food = new Food[m_foodCount];
-	// randomly place the food in the map
-	for (int i = 0; i < m_foodCount; i++)
-	{
-		int x = rand() % (MAZE_WIDTH - 1);
-		int y = rand() % (MAZE_HEIGHT - 1);
-		m_map[y][x].AddGameObject(&m_food[i]);
+	for (int i = 0; i < MAZE_HEIGHT * MAZE_WIDTH; i += 2) {
+		m_map[(int)(i / MAZE_WIDTH)][i % MAZE_WIDTH].RandomiseTransitions(&m_map);
 	}
 }
 
 void Game::DrawWelcomeMessage()
 {
-	std::cout << TITLE << MAGENTA << "Welcome to ZORP!" << YELLOW << std::endl;
-	std::cout << INDENT << "ZORP is a game of adventure, danger, and low cunning." << std::endl;
-	std::cout << INDENT << "It is definitely not related to any other text-based adventure game." << std::endl << std::endl;
+	
 }
 
 void Game::DrawMap()
@@ -226,11 +221,23 @@ void Game::DrawValidDirections()
 	std::cout << RESET_COLOR;
 	// jump to the correct location
 	std::cout << CSI << MOVEMENT_DESC_Y + 1 << ";" << 0 << "H";
-	std::cout << INDENT << "You can see paths leading to the " <<
-		((m_player.GetPosition().x > 0) ? "west, " : "") <<
-		((m_player.GetPosition().x < MAZE_WIDTH - 1) ? "east, " : "") <<
-		((m_player.GetPosition().y > 0) ? "north, " : "") <<
-		((m_player.GetPosition().y < MAZE_HEIGHT - 1) ? "south, " : "") << std::endl;
+	std::cout << INDENT << "You can see paths leading to the ";
+	for (int dir : m_map[m_player.GetPosition().y][m_player.GetPosition().x].GetTransitions()) {
+		switch (dir) {
+		case NORTH:
+			std::cout << "north, ";
+			break;
+		case SOUTH:
+			std::cout << "south, ";
+			break;
+		case EAST:
+			std::cout << "east, ";
+			break;
+		case WEST:
+			std::cout << "west, ";
+			break;
+		}
+	}
 }
 
 int Game::GetCommand()
