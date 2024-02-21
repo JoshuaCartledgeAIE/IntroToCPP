@@ -6,6 +6,7 @@ using namespace std;
 
 void RunTests();
 
+const int NUM_OF_TESTS = 13;
 
 int main()
 {
@@ -18,7 +19,7 @@ void RunTests() {
     // Runs many different test cases to test each function of the string class, and prints results to a file
 
     // Array to log test successes
-    bool successes[13];
+    bool successes[NUM_OF_TESTS];
     int testCount = 0;
 
     // Testing constructors and CStr to print to console
@@ -33,8 +34,8 @@ void RunTests() {
     cout << endl;
 
     // Testing Length
-    cout << "Length of test3 (expected result: 5): " << test3.Length() << endl << endl;
-    successes[testCount] = (test3.Length() == 5);
+    cout << "Length of test3 (expected result: 5): " << test3.Length() << endl << endl;   
+    successes[testCount] = (test3.Length() == 5); // Logs test result in the array (repeated for each test)
     testCount++;
 
     // Testing '+' operator
@@ -116,7 +117,7 @@ void RunTests() {
     for (int i : successes) {
         successPercent += i;
     }
-    successPercent /= 13;
+    successPercent /= NUM_OF_TESTS;
 
     // get current time and date
     struct tm newtime;
@@ -132,18 +133,31 @@ void RunTests() {
 
     // Open text file
     fstream file;
-    file.open("testlog.txt", ios::out);
+    file.open("testlog.txt", ios::app);
 
-    const char* testNames[13] = { "Length", "+ Operator", "EqualTo and == Operator", "Append", "Prepend", "ToUpper", "ToLower", "CharacterAt", "[] Operator", "Find", "Substring", "Replace", "< Operator"};
+    if (file.is_open()) {
+        // Name of each test, in order
+        const char* testNames[NUM_OF_TESTS] = { "Length", "+ Operator", "EqualTo and == Operator", "Append", "Prepend", "ToUpper", "ToLower", "CharacterAt", "[] Operator", "Find", "Substring", "Replace", "< Operator" };
 
-    // Log date and success percentage at top of file
-    file << "Date: " << day << "/" << mon << "/" << yr << " Time: " << hr << ":" << min << ":" << sec << " Successful " << successPercent * 100 << "%" << endl;
-    // For each test, log the name of the test and the result into the text file
-    for (int i = 0; i < 13; i++) {
-        file << "Test " << i << " " << testNames[i] << " " << (successes[i] ? "Successful" : "Failed") << endl;
+        // Log date and success percentage at top of file
+        file << "Date: " << day << "/" << mon << "/" << yr << " Time: " << hr << ":" << min << ":" << sec << " Successful " << successPercent * 100 << "%" << endl;
+        // For each test, log the name of the test and the result into the text file
+        for (int i = 0; i < NUM_OF_TESTS; i++) {
+            file << "Test " << i << " " << testNames[i] << " " << (successes[i] ? "Successful" : "Failed") << endl;
+        }
+
+        file << endl;
+
+        // Report successful logging of test results
+        cout << "Test results have been saved to 'testlog.txt'!" << endl;
+    }
+    else {
+        // An error occured when creating or opening the text file
+        cout << "The text file could not be created or written to." << endl;
     }
 
     // Close text file
     file.close();
+    
 }
 

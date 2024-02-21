@@ -1,4 +1,4 @@
-Date: 21/2/2024 Time: 15:11:20 Successful 100%
+Date: 21/2/2024 Time: 16:14:45 Successful 100%
 Test 0 Length Successful
 Test 1 + Operator Successful
 Test 2 EqualTo and == Operator Successful
@@ -12,3 +12,19 @@ Test 9 Find Successful
 Test 10 Substring Successful
 Test 11 Replace Successful
 Test 12 < Operator Successful
+
+Date: 21/2/2024 Time: 16:14:50 Successful 100%
+Test 0 Length Successful
+Test 1 + Operator Successful
+Test 2 EqualTo and == Operator Successful
+Test 3 Append Successful
+Test 4 Prepend Successful
+Test 5 ToUpper Successful
+Test 6 ToLower Successful
+Test 7 CharacterAt Successful
+Test 8 [] Operator Successful
+Test 9 Find Successful
+Test 10 Substring Successful
+Test 11 Replace Successful
+Test 12 < Operator Successful
+
