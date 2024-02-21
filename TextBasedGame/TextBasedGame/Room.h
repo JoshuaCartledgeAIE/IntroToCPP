@@ -29,6 +29,7 @@ public:
 	Item* GetItem();
 
 	void RandomiseTransitions(Game* game);
+	void ClearTransitions();
 	void AddTransition(int t, Game* game, bool addInverse);
 
 	std::vector<int> GetTransitions() { return m_transitions; }

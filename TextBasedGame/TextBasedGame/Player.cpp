@@ -203,11 +203,16 @@ void Player::CastSpell(String spellName, Game* game)
 	for (Spell* spell : m_spells) {
 		if (spellName == spell->GetName().ToLower()) {
 			// Spell exists, therefore attempt to cast it
-			if (!spell->Cast(game, game->GetPlayer())) {
+			// Check if player has enough mana first
+			if (m_manaPoints < spell->GetCost()) {
 				// Spell failed to cast (not enough mana)
-				std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << 
+				std::cout << EXTRA_OUTPUT_POS << RESET_COLOR <<
 					"You dont have enough MP to cast that spell!" << std::endl;
+				return;
 			}
+			// Cast the spell and spend the mana
+			!spell->Cast(game, game->GetPlayer());
+			m_manaPoints -= spell->GetCost();
 			return;
 		}
 	}

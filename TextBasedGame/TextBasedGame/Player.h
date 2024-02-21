@@ -24,6 +24,7 @@ public:
 
 	float GetMana() { return m_manaPoints; }
 
+
 	void Draw() override;
 	void DrawDescription() override;
 	void LookAt() override;

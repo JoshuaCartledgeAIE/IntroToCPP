@@ -157,9 +157,6 @@ Item* Room::GetItem()
 
 void Room::RandomiseTransitions(Game* game)
 {
-	// clear transitions
-	m_transitions.clear();
-
 	int tCount = rand() % 3 + 1; // add random number of transitions between 1 and 4
 	int emergencyExit = 0;
 	while (m_transitions.size() < tCount) {
@@ -172,6 +169,12 @@ void Room::RandomiseTransitions(Game* game)
 		if (emergencyExit > 100) break;
 	}
 
+}
+
+void Room::ClearTransitions()
+{
+	// clear transitions
+	m_transitions.clear();
 }
 
 
