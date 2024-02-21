@@ -3,14 +3,17 @@
 #include <iostream>
 #include "Point2D.h"
 #include "String.h"
-
+#include <vector>
 #include "Enemy.h"
 #include <algorithm>
 #include "Room.h"
 #include "Character.h"
+#include "Shift.h"
+#include "Game.h"
 
 Player::Player() : Character{{0,0}, m_maxHP, BASE_AT, BASE_DF}
 {
+	m_manaPoints = m_maxMP;
 	m_healthPoints = m_maxHP;
 	m_attackPoints = BASE_AT;
 	m_defendPoints = BASE_DF;
@@ -19,6 +22,7 @@ Player::Player() : Character{{0,0}, m_maxHP, BASE_AT, BASE_DF}
 
 Player::Player(Point2D position) : Character{ position, m_maxHP, BASE_AT, BASE_DF }
 {
+	m_manaPoints = m_maxMP;
 	m_healthPoints = m_maxHP;
 	m_attackPoints = BASE_AT;
 	m_defendPoints = BASE_DF;
@@ -52,10 +56,11 @@ void Player::AddItem(Item* pUp)
 void Player::Draw()
 {
 	// Draw stats at top of screen
-	std::cout << STATS_OUTPUT_POS << "HP: " << (int)m_healthPoints << "/" << (int)m_maxHP
+	std::cout << STATS_OUTPUT_POS << "HP: " << (int)m_healthPoints << "/" << (int)m_maxHP 
+		<< "    MP: " << (int)m_manaPoints << "/" << (int)m_maxMP
 		<< "    Attack: " << (int)m_attackPoints << "     Defense: " << (int)m_defendPoints;
 
-	Point2D outPos = { INDENT_X + (5 * m_mapPosition.x) + 2,  MAP_Y + (m_mapPosition.y * 2) };
+	Point2D outPos = { INDENT_X + (5 * m_mapPosition.x) + 3,  MAP_Y + (m_mapPosition.y * 2) };
 	// draw the player's position on the map
 	// move cursor to map pos and delete character at current position, replace it with player
 	std::cout << CSI << outPos.y << ";" << outPos.x << "H";
@@ -78,26 +83,43 @@ void Player::LookAt()
 {
 }
 
-void Player::ExecuteCommand(int command, Room* pRoom)
+void Player::LearnSpell(String spellName)
 {
+	// Add the specified spell to player's known spells
+	if (spellName == "Shift") {
+		Shift* shiftSpell = new Shift;
+		m_spells.push_back(shiftSpell);
+	}
+	else {
+		return;
+	}
+
+	// Then sort spells alphabetically
+	std::sort(m_spells.begin(), m_spells.end(), Spell::Compare);
+}
+
+void Player::ExecuteCommand(int command, Room* pRoom, String spellName, Game* game)
+{
+	std::vector<int> transitions = pRoom->GetTransitions();
+
 	switch (command) {
 	case EAST:
-		if (m_mapPosition.x < MAZE_WIDTH - 1) {
+		if (m_mapPosition.x < MAZE_WIDTH - 1 && std::find(transitions.begin(), transitions.end(), command) != transitions.end()) {
 			m_mapPosition.x++;
 		}
 		return;
 	case WEST:
-		if (m_mapPosition.x > 0) {
+		if (m_mapPosition.x > 0 && std::find(transitions.begin(), transitions.end(), command) != transitions.end()) {
 			m_mapPosition.x--;
 		}
 		return;
 	case NORTH:
-		if (m_mapPosition.y > 0) {
+		if (m_mapPosition.y > 0 && std::find(transitions.begin(), transitions.end(), command) != transitions.end()) {
 			m_mapPosition.y--;
 		}
 		return;
 	case SOUTH:
-		if (m_mapPosition.y < MAZE_HEIGHT - 1) {
+		if (m_mapPosition.y < MAZE_HEIGHT - 1 && std::find(transitions.begin(), transitions.end(), command) != transitions.end()) {
 			m_mapPosition.y++;
 		}
 		return;
@@ -109,6 +131,9 @@ void Player::ExecuteCommand(int command, Room* pRoom)
 		break;
 	case PICKUP:
 		Pickup(pRoom);
+		break;
+	case CAST:
+		CastSpell(spellName, game);
 		break;
 	default:
 		// the command was not valid so do nothing
@@ -170,6 +195,26 @@ void Player::Attack(Enemy* pEnemy)
 				" health remaining." << std::endl;
 		}
 	}
+}
+
+void Player::CastSpell(String spellName, Game* game)
+{
+	// Search for spell in spellbook
+	for (Spell* spell : m_spells) {
+		if (spellName == spell->GetName().ToLower()) {
+			// Spell exists, therefore attempt to cast it
+			if (!spell->Cast(game, game->GetPlayer())) {
+				// Spell failed to cast (not enough mana)
+				std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << 
+					"You dont have enough MP to cast that spell!" << std::endl;
+			}
+			return;
+		}
+	}
+
+	// If program reaches here, the spell was not found in the player's known spells
+	std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << 
+		"You don't know how to cast '" << spellName << "'." << std::endl;
 }
 
 

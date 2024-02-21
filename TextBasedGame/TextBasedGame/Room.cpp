@@ -8,6 +8,7 @@
 #include "GameObject.h"
 #include "Enemy.h"
 #include <algorithm>
+#include "Game.h"
 
 Room::Room() : m_mapPosition{0, 0}, m_type{EMPTY}
 {
@@ -44,7 +45,7 @@ void Room::RemoveGameObject(GameObject* object)
 void Room::Draw()
 {
 	// find the console output position
-	Point2D outPos = { INDENT_X + (5 * m_mapPosition.x) + 1,  MAP_Y + (m_mapPosition.y * 2) };
+	Point2D outPos = { INDENT_X + (5 * m_mapPosition.x) + 2,  MAP_Y + (m_mapPosition.y * 2) };
 	// jump to the correct location
 	std::cout << CSI << outPos.y << ";" << outPos.x << "H" << RESET_COLOR;
 	
@@ -102,8 +103,8 @@ void Room::DrawDescription()
 	std::cout << RESET_COLOR;
 	// jump to the correct location
 	std::cout << CSI << ROOM_DESC_Y << ";" << 0 << "H";
-	// Delete 1 line and insert 1 empty line
-	std::cout << CSI << "1M" << CSI << "1L" << std::endl;
+	// Delete 2 lines and insert 2 empty lines
+	std::cout << CSI << "2M" << CSI << "2L" << std::endl;
 	// write description of current room
 	switch (m_type) {
 	case EMPTY:
@@ -154,15 +155,18 @@ Item* Room::GetItem()
 	return nullptr;
 }
 
-void Room::RandomiseTransitions(Room** map)
+void Room::RandomiseTransitions(Game* game)
 {
-	int tCount = rand() % 2 + 1; // add random number of transitions between 2 and 4
+	// clear transitions
+	m_transitions.clear();
+
+	int tCount = rand() % 3 + 1; // add random number of transitions between 1 and 4
 	int emergencyExit = 0;
 	while (m_transitions.size() < tCount) {
 		int dirToAdd = (rand() % 4 + 1) * 2;
-		// Check if transition is already in the vector before adding
+		// Ensure that transition is not already in the vector before adding
 		if (std::find(m_transitions.begin(), m_transitions.end(), dirToAdd) == m_transitions.end()) {
-			AddTransition(dirToAdd, map, true);
+			AddTransition(dirToAdd, game, true);
 		}
 		emergencyExit++;
 		if (emergencyExit > 100) break;
@@ -170,43 +174,39 @@ void Room::RandomiseTransitions(Room** map)
 
 }
 
-/// <summary>
-/// PASSING MAP THROUGH TO HERE HAS A LOT OF PROBLEMS RIGHT NOW, NEED TO FIX LATER!!!
-/// </summary>
-/// <param name="tranDir"></param>
-/// <param name="map"></param>
-/// <param name="addInverse"></param>
 
-void Room::AddTransition(int tranDir, Room** map, bool addInverse)
+void Room::AddTransition(int transitionDir, Game* game, bool addInverse)
 {
 	// Check if on edge and transition is trying to go toward edge
-	if (tranDir == NORTH && m_mapPosition.y == 0)
+	if (transitionDir == NORTH && m_mapPosition.y == 0)
 		return;
-	if (tranDir == SOUTH && m_mapPosition.y == MAZE_HEIGHT - 1)
+	if (transitionDir == SOUTH && m_mapPosition.y == MAZE_HEIGHT - 1)
 		return;
-	if (tranDir == WEST && m_mapPosition.x == 0)
+	if (transitionDir == WEST && m_mapPosition.x == 0)
 		return;
-	if (tranDir == EAST && m_mapPosition.x == MAZE_WIDTH - 1)
+	if (transitionDir == EAST && m_mapPosition.x == MAZE_WIDTH - 1)
 		return;
 
 	// Add transition to this room
-	m_transitions.push_back(tranDir);
+	m_transitions.push_back(transitionDir);
 	std::sort(m_transitions.begin(), m_transitions.end());
 
 	// Add the same transition in reverse to the adjoining room
-	switch (tranDir) {
-	case NORTH:
-		map[m_mapPosition.y - 1][m_mapPosition.x].AddTransition(SOUTH, map, false);
-		break;
-	case SOUTH:
-		map[m_mapPosition.y + 1][m_mapPosition.x].AddTransition(NORTH, map, false);
-		break;
-	case EAST:
-		map[m_mapPosition.y][m_mapPosition.x + 1].AddTransition(WEST, map, false);
-		break;
-	case WEST:
-		map[m_mapPosition.y][m_mapPosition.x - 1].AddTransition(EAST, map, false);
-		break;
+	if (addInverse) {
+		switch (transitionDir) {
+		case NORTH:
+			game->GetRoom(m_mapPosition.y - 1, m_mapPosition.x).AddTransition(SOUTH, game, false);
+			break;
+		case SOUTH:
+			game->GetRoom(m_mapPosition.y + 1, m_mapPosition.x).AddTransition(NORTH, game, false);
+			break;
+		case EAST:
+			game->GetRoom(m_mapPosition.y, m_mapPosition.x + 1).AddTransition(WEST, game, false);
+			break;
+		case WEST:
+			game->GetRoom(m_mapPosition.y, m_mapPosition.x - 1).AddTransition(EAST, game, false);
+			break;
+		}
 	}
 }
 

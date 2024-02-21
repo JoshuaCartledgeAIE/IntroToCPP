@@ -18,6 +18,9 @@ public:
 	void Draw();
 	bool IsGameOver();
 
+	Room& GetRoom(int x, int y);
+	Player* GetPlayer() { return &m_player; }
+
 private:
 	bool EnableVirtualTerminal();
 	void InitializeMap();
@@ -28,6 +31,7 @@ private:
 
 	void DrawWelcomeMessage();
 	void DrawMap();
+	void DrawMapBorders();
 	void DrawValidDirections();
 
 	int GetCommand();
@@ -47,5 +51,7 @@ private:
 	Item* m_Items;
 
 	Player m_player;
+
+	String m_spellName;
 };
 

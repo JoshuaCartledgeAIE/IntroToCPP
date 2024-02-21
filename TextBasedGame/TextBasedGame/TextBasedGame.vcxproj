@@ -134,6 +134,8 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="Room.cpp" />
+    <ClCompile Include="Shift.cpp" />
+    <ClCompile Include="Spell.cpp" />
     <ClCompile Include="String.cpp" />
     <ClCompile Include="TextBasedGame.cpp" />
   </ItemGroup>
@@ -147,6 +149,8 @@
     <ClInclude Include="Point2D.h" />
     <ClInclude Include="Item.h" />
     <ClInclude Include="Room.h" />
+    <ClInclude Include="Shift.h" />
+    <ClInclude Include="Spell.h" />
     <ClInclude Include="String.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

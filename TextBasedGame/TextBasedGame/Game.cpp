@@ -40,6 +40,8 @@ bool Game::Startup()
 
 	// Set player to start pos
 	m_player.SetPosition(Point2D{ 0,0 });
+	// Have player learn first spell
+	m_player.LearnSpell(String("Shift"));
 
 	DrawWelcomeMessage();
 
@@ -65,7 +67,7 @@ void Game::Update()
 	}
 
 	// Execute the command
-	m_player.ExecuteCommand(command, &m_map[playerPos.y][playerPos.x]);
+	m_player.ExecuteCommand(command, &m_map[playerPos.y][playerPos.x], m_spellName, this);
 	
 	// If there are any dead enemies, remove them from their room
 	for (int i = 0; i < m_enemyCount; i++) {
@@ -95,6 +97,11 @@ void Game::Draw()
 bool Game::IsGameOver()
 {
 	return m_gameOver;
+}
+
+Room& Game::GetRoom(int y, int x)
+{
+	return m_map[y][x];
 }
 
 bool Game::EnableVirtualTerminal()
@@ -190,7 +197,7 @@ void Game::InitializeItems()
 void Game::GenerateTransitions()
 {
 	for (int i = 0; i < MAZE_HEIGHT * MAZE_WIDTH; i += 2) {
-		m_map[(int)(i / MAZE_WIDTH)][i % MAZE_WIDTH].RandomiseTransitions(&m_map);
+		m_map[(int)(i / MAZE_WIDTH)][i % MAZE_WIDTH].RandomiseTransitions(this);
 	}
 }
 
@@ -213,6 +220,39 @@ void Game::DrawMap()
 		}
 		std::cout << std::endl;
 	}
+
+	// Draw Map borders (afterward so nothing draws over them)
+	DrawMapBorders();
+}
+
+void Game::DrawMapBorders() {
+	// Draw top map border
+	std::cout << YELLOW << MAP_OUTPUT_POS << "\xC9";
+	for (int i = 0; i < MAZE_WIDTH * 5 - 1; i++) {
+		std::cout << "\xCD";
+	}
+	std::cout << "\xBB" << std::endl;
+
+	// Draw side map borders
+	std::cout << MAP_OUTPUT_POS << CSI << "1C";
+	for (int i = 0; i < MAZE_HEIGHT * 2 - 1; i++) {
+		// Move cursor down 1 and back 1 and draw vertical line char
+		std::cout << CSI << "1B" << CSI << "1D" << "\xBA";
+	}
+	// Move to other side of map
+	std::cout << CSI << MAP_Y - 1 << ";" << MAZE_WIDTH * 5 + 7 << "H";
+	for (int i = 0; i < MAZE_HEIGHT * 2 - 1; i++) {
+		// Move cursor down 1 and back 1 and draw vertical line char
+		std::cout << CSI << "1B" << CSI << "1D" << "\xBA";
+	}
+
+	// Draw bottom map border
+	std::cout << CSI << MAP_Y - 1 + MAZE_HEIGHT * 2 << ";6H" << "\xC8";
+	for (int i = 0; i < MAZE_WIDTH * 5 - 1; i++) {
+		std::cout << "\xCD";
+	}
+	std::cout << "\xBC" << std::endl << RESET_COLOR;
+
 }
 
 void Game::DrawValidDirections()
@@ -221,6 +261,9 @@ void Game::DrawValidDirections()
 	std::cout << RESET_COLOR;
 	// jump to the correct location
 	std::cout << CSI << MOVEMENT_DESC_Y + 1 << ";" << 0 << "H";
+	// Delete 1 lines and insert 1 line
+	std::cout << CSI << "1M" << CSI << "1L";
+
 	std::cout << INDENT << "You can see paths leading to the ";
 	for (int dir : m_map[m_player.GetPosition().y][m_player.GetPosition().x].GetTransitions()) {
 		switch (dir) {
@@ -260,6 +303,8 @@ int Game::GetCommand()
 	String inputCommand;
 	// Read from console and convert to lowercase
 	inputCommand.ReadFromConsole();
+
+	m_spellName = "";
 
 	// Move command has a direction afterward
 	if (inputCommand.Find("W") == 0) {
@@ -305,8 +350,11 @@ int Game::GetCommand()
 		else if (inputCommand.Find("exit") == 0) {
 			commandNo = QUIT;
 		}
+		else if (inputCommand.Find("cast") == 0) {
+			commandNo = CAST;
+			m_spellName = inputCommand.Substring(5, inputCommand.Length());
+		}
 	}
 	
-
 	return commandNo;
 }

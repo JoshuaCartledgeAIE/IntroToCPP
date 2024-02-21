@@ -7,6 +7,7 @@ class GameObject;
 class Item;
 class Player;
 class Enemy;
+class Game;
 
 class Room
 {
@@ -27,8 +28,8 @@ public:
 	Enemy* GetEnemy();
 	Item* GetItem();
 
-	void RandomiseTransitions(Room** map);
-	void AddTransition(int t, Room** map, bool addInverse);
+	void RandomiseTransitions(Game* game);
+	void AddTransition(int t, Game* game, bool addInverse);
 
 	std::vector<int> GetTransitions() { return m_transitions; }
 

@@ -12,9 +12,9 @@ const char* const WHITE = "\x1b[97m";
 const char* const GREEN = "\x1b[92m";
 const char* const RESET_COLOR = "\x1b[0m";
 const char* const STATS_OUTPUT_POS = "\x1b[2;6H";
-const char* const MAP_OUTPUT_POS = "\x1b[4;6H";
-const char* const EXTRA_OUTPUT_POS = "\x1b[21;6H";
-const char* const INVENTORY_OUTPUT_POS = "\x1b[28;6H";
+const char* const MAP_OUTPUT_POS = "\x1b[3;6H";
+const char* const EXTRA_OUTPUT_POS = "\x1b[22;6H";
+const char* const INVENTORY_OUTPUT_POS = "\x1b[29;6H";
 
 // room types
 const int EMPTY = 0;
@@ -29,11 +29,11 @@ const int MAZE_HEIGHT = 7;
 
 // screen positions
 const int INDENT_X = 5;
-const int ROOM_DESC_Y = 17;
-const int MOVEMENT_DESC_Y = 18;
-const int MAP_Y = 3;
+const int ROOM_DESC_Y = 18;
+const int MOVEMENT_DESC_Y = 19;
+const int MAP_Y = 4;
 const int PLAYER_INPUT_X = 30;
-const int PLAYER_INPUT_Y = 20;
+const int PLAYER_INPUT_Y = 21;
 
 // input commands
 const int SOUTH = 2;
@@ -44,7 +44,8 @@ const int NORTH = 8;
 const int LOOK = 9;
 const int FIGHT = 10;
 const int PICKUP = 11;
-const int QUIT = 12;
+const int CAST = 12;
+const int QUIT = 13;
 
 // Adjectives for item names
 static const char itemNames[15][30] = {
