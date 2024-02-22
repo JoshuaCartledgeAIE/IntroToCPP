@@ -10,7 +10,7 @@
 #include <algorithm>
 #include "Game.h"
 
-Room::Room() : m_mapPosition{0, 0}, m_type{EMPTY}
+Room::Room() : m_mapPosition{0, 0}, m_type{EMPTY}, m_isRevealed{false}
 {
 }
 
@@ -44,6 +44,9 @@ void Room::RemoveGameObject(GameObject* object)
 
 void Room::Draw()
 {
+	// Do not draw the room if it has not been revealed yet
+	if (!m_isRevealed && m_type != EXIT) { return; }
+
 	// find the console output position
 	Point2D outPos = { INDENT_X + (5 * m_mapPosition.x) + 2,  MAP_Y + (m_mapPosition.y * 2) };
 	// jump to the correct location
@@ -57,7 +60,7 @@ void Room::Draw()
 		}
 		else {
 			// empty room
-			std::cout << "[" << GREEN << "\xb0" << RESET_COLOR << "]  ";
+			std::cout << "[" << GREEN << "\xb1" << RESET_COLOR << "]  ";
 		}
 		break;
 	case ENTRANCE:
@@ -113,25 +116,15 @@ void Room::DrawDescription()
 		}
 		else {
 			// empty room
-			std::cout << INDENT << "You are in an empty meadow. There is nothing of note here." << std::endl;
+			std::cout << INDENT << "You are in an empty room. There is nothing of note here." << std::endl;
 		}
 		break;
 	case ENTRANCE:
-		std::cout << INDENT << "The entrance you used to enter this maze is blocked.There is no going back." << std::endl;
+		std::cout << INDENT << "The entrance you used to enter this maze is blocked. You must reach the exit to escape." << std::endl;
 		break;
 	case EXIT:
-		std::cout << INDENT << "Despite all odds, you made it to the exit. Congratulations." << std::endl;
+		std::cout << INDENT << "Despite all odds, you made it to the exit. Congratulations!" << std::endl;
 		break;
-	}
-}
-
-void Room::LookAt()
-{
-	if (m_objects.size() > 0) {
-		m_objects[0]->LookAt();
-	}
-	else {
-		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You look around, but see nothing worth mentioning" << std::endl;
 	}
 }
 

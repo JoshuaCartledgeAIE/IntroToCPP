@@ -42,8 +42,7 @@ bool Game::Startup()
 	m_player.SetPosition(Point2D{ 0,0 });
 	// Have player learn first spell
 	m_player.LearnSpell(String("Shift"));
-
-	DrawWelcomeMessage();
+	m_player.LearnSpell(String("Teleport"));
 
 	return true;
 }
@@ -87,6 +86,9 @@ void Game::Draw()
 	DrawValidDirections();
 	
 	m_map[playerPos.y][playerPos.x].DrawDescription();
+
+	// Update visibility of rooms
+	UpdateRoomVisibility();
 
 	// Draw map and player
 	DrawMap();
@@ -201,9 +203,19 @@ void Game::GenerateTransitions()
 	}
 }
 
-void Game::DrawWelcomeMessage()
+void Game::UpdateRoomVisibility()
 {
-	
+	// Get player position
+	Point2D playerPos = m_player.GetPosition();
+	Point2D position = { 0, 0 };
+	// Loop through rooms and make them visible if they are 3 rooms away from the player
+	for (position.y = 0; position.y < MAZE_HEIGHT; position.y++)
+	{
+		for (position.x = 0; position.x < MAZE_WIDTH; position.x++) {
+			if (abs(playerPos.x - position.x) + abs(playerPos.y - position.y) <= VISION_RANGE)
+			m_map[position.y][position.x].SetVisibility(true);
+		}
+	}
 }
 
 void Game::DrawMap()
@@ -223,6 +235,8 @@ void Game::DrawMap()
 
 	// Draw Map borders (afterward so nothing draws over them)
 	DrawMapBorders();
+
+	DrawLegend();
 }
 
 void Game::DrawMapBorders() {
@@ -255,6 +269,32 @@ void Game::DrawMapBorders() {
 
 }
 
+void Game::DrawLegend()
+{
+	// Position cursor right of map
+	std::cout << CSI << "6;" << MAZE_WIDTH * 5 + 11 << "H";
+	std::cout << YELLOW << "Map Legend:" << RESET_COLOR << std::endl;
+	std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
+
+	std::cout << "\x9d = Entrance" << std::endl;
+	std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
+
+	std::cout << MAGENTA << "\x81" << RESET_COLOR << " = Player" << std::endl;
+	std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
+
+	std::cout << GREEN << "\xb1" << RESET_COLOR << " = Empty" << std::endl;
+	std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
+
+	std::cout << RED << "\x94" << RESET_COLOR << " = Enemy" << std::endl;
+	std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
+
+	std::cout << YELLOW << "$" << RESET_COLOR << " = Treasure" << std::endl;
+	std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
+	std::cout << "\xFE = Exit" << std::endl;
+	std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
+	
+}
+
 void Game::DrawValidDirections()
 {
 	// reset draw colors
@@ -264,21 +304,36 @@ void Game::DrawValidDirections()
 	// Delete 1 lines and insert 1 line
 	std::cout << CSI << "1M" << CSI << "1L";
 
-	std::cout << INDENT << "You can see paths leading to the ";
-	for (int dir : m_map[m_player.GetPosition().y][m_player.GetPosition().x].GetTransitions()) {
+	int dirCount = m_map[m_player.GetPosition().y][m_player.GetPosition().x].GetTransitions().size();
+	if (dirCount > 1)
+		std::cout << INDENT << "You can see paths leading to the ";
+	else
+		std::cout << INDENT << "You can see a path leading to the ";
+	
+	for (int i = 0; i < dirCount; i++) {
+		int dir = m_map[m_player.GetPosition().y][m_player.GetPosition().x].GetTransitions()[i];
 		switch (dir) {
 		case NORTH:
-			std::cout << "north, ";
+			std::cout << "north";
 			break;
 		case SOUTH:
-			std::cout << "south, ";
+			std::cout << "south";
 			break;
 		case EAST:
-			std::cout << "east, ";
+			std::cout << "east";
 			break;
 		case WEST:
-			std::cout << "west, ";
+			std::cout << "west";
 			break;
+		}
+		if (i < dirCount - 2) {
+			std::cout << ", ";
+		}
+		else if (i < dirCount - 1) {
+			std::cout << " and ";
+		}
+		else {
+			std::cout << ".";
 		}
 	}
 }
@@ -338,21 +393,18 @@ int Game::GetCommand()
 			}
 			else return -1; // Invalid direction word
 		}
-		else if (inputCommand.Find("look") == 0) {
-			commandNo = LOOK;
-		}
 		else if (inputCommand.Find("fight") == 0) {
 			commandNo = FIGHT;
 		}
 		else if (inputCommand.Find("pickup") == 0) {
 			commandNo = PICKUP;
 		}
-		else if (inputCommand.Find("exit") == 0) {
-			commandNo = QUIT;
-		}
 		else if (inputCommand.Find("cast") == 0) {
 			commandNo = CAST;
 			m_spellName = inputCommand.Substring(5, inputCommand.Length());
+		}
+		else if (inputCommand.Find("exit") == 0) {
+			commandNo = QUIT;
 		}
 	}
 	

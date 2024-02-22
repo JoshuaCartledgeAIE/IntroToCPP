@@ -24,7 +24,7 @@ const int EXIT = ENTRANCE + 1;
 const int WINDOW_HEIGHT = 60;
 const int WINDOW_WIDTH = 150;
 
-const int MAZE_WIDTH = 9;
+const int MAZE_WIDTH = 15;
 const int MAZE_HEIGHT = 7;
 
 // screen positions
@@ -36,20 +36,21 @@ const int PLAYER_INPUT_X = 30;
 const int PLAYER_INPUT_Y = 21;
 
 // input commands
-const int SOUTH = 2;
+const int NORTH = 2;
 const int EAST = 6;
-const int WEST = 4;
-const int NORTH = 8;
+const int SOUTH = 4;
+const int WEST = 8;
 
-const int LOOK = 9;
-const int FIGHT = 10;
-const int PICKUP = 11;
-const int CAST = 12;
-const int QUIT = 13;
+const int FIGHT = 9;
+const int PICKUP = 10;
+const int CAST = 11;
+const int QUIT = 12;
+
+const int VISION_RANGE = 1;
 
 // Adjectives for item names
 static const char itemNames[15][30] = {
-"indifference", "invisibility", "invulnerability", "incontinence",
+"bravery", "courage", "invulnerability", "incontinence",
 "improbability", "impatience", "indecision", "inspiration",
 "independence", "incurability", "integration", "invocation",
 "inferno", "indigestion", "inoculation"
@@ -59,5 +60,5 @@ static const char itemNames[15][30] = {
 const int PRIORITY_DEFAULT = 5;
 const int PRIORITY_PLAYER = 0;
 const int PRIORITY_ENEMY = 1;
-const int PRIORITY_Item = 2;
+const int PRIORITY_ITEM = 2;
 const int PRIORITY_FOOD = 3;

@@ -26,8 +26,3 @@ void Enemy::DrawDescription()
 	std::cout << INDENT << RED << "BEWARE." << RESET_COLOR << " An enemy is approaching." << std::endl;
 }
 
-void Enemy::LookAt()
-{
-	std::cout << EXTRA_OUTPUT_POS << RESET_COLOR <<
-		"LOOK OUT! An enemy is approaching." << std::endl;
-}

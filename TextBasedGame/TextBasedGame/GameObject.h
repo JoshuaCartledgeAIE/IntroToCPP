@@ -15,8 +15,6 @@ public:
 	virtual void Draw() = 0;
 	virtual void DrawDescription() = 0;
 
-	virtual void LookAt() = 0;
-
 	static bool Compare(const GameObject* p1, const GameObject* p2) { return p1->m_priority < p2->m_priority; }
 
 protected:

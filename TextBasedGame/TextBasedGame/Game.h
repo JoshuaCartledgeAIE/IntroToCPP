@@ -29,9 +29,10 @@ private:
 	
 	void GenerateTransitions();
 
-	void DrawWelcomeMessage();
+	void UpdateRoomVisibility();
 	void DrawMap();
 	void DrawMapBorders();
+	void DrawLegend();
 	void DrawValidDirections();
 
 	int GetCommand();

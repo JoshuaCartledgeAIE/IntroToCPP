@@ -9,9 +9,10 @@
 #include "Room.h"
 #include "Character.h"
 #include "Shift.h"
+#include "Teleport.h"
 #include "Game.h"
 
-Player::Player() : Character{{0,0}, m_maxHP, BASE_AT, BASE_DF}
+Player::Player() : Character{{0,0}, m_maxHP, BASE_AT, BASE_DF}, m_inCombat{false}
 {
 	m_manaPoints = m_maxMP;
 	m_healthPoints = m_maxHP;
@@ -20,7 +21,7 @@ Player::Player() : Character{{0,0}, m_maxHP, BASE_AT, BASE_DF}
 	m_priority = PRIORITY_PLAYER;
 }
 
-Player::Player(Point2D position) : Character{ position, m_maxHP, BASE_AT, BASE_DF }
+Player::Player(Point2D position) : Character{ position, m_maxHP, BASE_AT, BASE_DF }, m_inCombat{ false }
 {
 	m_manaPoints = m_maxMP;
 	m_healthPoints = m_maxHP;
@@ -67,19 +68,30 @@ void Player::Draw()
 	std::cout << MAGENTA << "\x81" << RESET_COLOR;
 
 	// Draw inventory
-	std::cout << INVENTORY_OUTPUT_POS << CSI << "4M";
-	std::cout << INVENTORY_OUTPUT_POS <<"Inventory: ";
+	std::cout << INVENTORY_OUTPUT_POS << CSI << "15M"; 
+	std::cout << INVENTORY_OUTPUT_POS << YELLOW << "Inventory: " << RESET_COLOR;
 	for (auto iter = m_Items.begin(); iter < m_Items.end(); iter++) {
 		std::cout << (*iter)->GetName() << "\t";
 	}
-	
+
+	// Draw spellbook
+	std::cout << std::endl << std::endl << INDENT << YELLOW;
+	if (m_inCombat)
+		std::cout << "Known Combat Spells:";
+	else
+		std::cout << "Known Utility Spells:";
+	std::cout << RESET_COLOR << std::endl;
+
+	for (auto iter = m_spells.begin(); iter < m_spells.end(); iter++) {
+		// display utility or combat spells based on whether player is in combat
+		if ((*iter)->IsForCombat() == m_inCombat) { 
+			std::cout << INDENT << INDENT <<
+				(*iter)->GetName() << ": " << (*iter)->GetDescription() << std::endl;
+		}
+	}
 }
 
 void Player::DrawDescription()
-{
-}
-
-void Player::LookAt()
 {
 }
 
@@ -87,8 +99,12 @@ void Player::LearnSpell(String spellName)
 {
 	// Add the specified spell to player's known spells
 	if (spellName == "Shift") {
-		Shift* shiftSpell = new Shift;
-		m_spells.push_back(shiftSpell);
+		Shift* spell = new Shift;
+		m_spells.push_back(spell);
+	}
+	else if (spellName == "Teleport") {
+		Teleport* spell = new Teleport;
+		m_spells.push_back(spell);
 	}
 	else {
 		return;
@@ -123,9 +139,6 @@ void Player::ExecuteCommand(int command, Room* pRoom, String spellName, Game* ga
 			m_mapPosition.y++;
 		}
 		return;
-	case LOOK:
-		pRoom->LookAt();
-		break;
 	case FIGHT:
 		Attack(pRoom->GetEnemy());
 		break;
@@ -199,27 +212,39 @@ void Player::Attack(Enemy* pEnemy)
 
 void Player::CastSpell(String spellName, Game* game)
 {
-	// Search for spell in spellbook
+	// Search for spell in spellbook (Replace with binary search later???)
 	for (Spell* spell : m_spells) {
 		if (spellName == spell->GetName().ToLower()) {
 			// Spell exists, therefore attempt to cast it
+			// Check if spell is for the current state (combat or utility)
+			if (spell->IsForCombat() != m_inCombat) {
+				std::cout << EXTRA_OUTPUT_POS << RED <<
+					"Now is not the time to use that spell!" << std::endl;
+				return;
+			}
 			// Check if player has enough mana first
 			if (m_manaPoints < spell->GetCost()) {
 				// Spell failed to cast (not enough mana)
-				std::cout << EXTRA_OUTPUT_POS << RESET_COLOR <<
-					"You dont have enough MP to cast that spell!" << std::endl;
+				std::cout << EXTRA_OUTPUT_POS << RED <<
+					"You dont have enough MP to cast that spell!" << RESET_COLOR << std::endl;
 				return;
 			}
 			// Cast the spell and spend the mana
-			!spell->Cast(game, game->GetPlayer());
+			spell->Cast(game, game->GetPlayer());
 			m_manaPoints -= spell->GetCost();
+
+			// Redraw game and player to update any changes that the spells made
+			game->Draw();
+			Draw(); // to update the player position and mana points
+
+			std::cout << std::endl;
 			return;
 		}
 	}
 
 	// If program reaches here, the spell was not found in the player's known spells
-	std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << 
-		"You don't know how to cast '" << spellName << "'." << std::endl;
+	std::cout << EXTRA_OUTPUT_POS << RED << 
+		"You don't know how to cast '" << spellName << "'."  << RESET_COLOR << std::endl;
 }
 
 

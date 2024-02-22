@@ -24,10 +24,10 @@ public:
 
 	float GetMana() { return m_manaPoints; }
 
+	bool IsInCombat() { return m_inCombat; }
 
 	void Draw() override;
 	void DrawDescription() override;
-	void LookAt() override;
 
 	void LearnSpell(String spellName);
 
@@ -48,5 +48,7 @@ private:
 	const int BASE_DF = 5;
 
 	std::vector<Spell*> m_spells;
+
+	bool m_inCombat;
 };
 

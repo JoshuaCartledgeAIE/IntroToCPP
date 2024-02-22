@@ -13,9 +13,10 @@ public:
 	Spell(int cost, String name, bool forCombat, String desc);
 	~Spell();
 
-	virtual bool Cast(Game* game, Player* pPlayer) = 0;
+	virtual void Cast(Game* game, Player* pPlayer) = 0;
 
 	String GetName() { return m_name; }
+	String GetDescription() { return m_description; }
 	int GetCost() { return m_manaCost; }
 
 	bool IsForCombat() { return m_forCombat; }

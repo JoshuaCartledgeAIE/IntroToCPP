@@ -4,11 +4,11 @@
 #include "Room.h"
 #include "Player.h"
 
-class Shift : public Spell
+class Teleport : public Spell
 {
 public:
-	Shift();
-	~Shift();
+	Teleport();
+	~Teleport();
 
 	void Cast(Game* game, Player* pPlayer) override;
 

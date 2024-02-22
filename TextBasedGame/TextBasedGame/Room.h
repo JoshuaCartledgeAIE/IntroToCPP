@@ -23,7 +23,6 @@ public:
 
 	void Draw();
 	void DrawDescription();
-	void LookAt();
 
 	Enemy* GetEnemy();
 	Item* GetItem();
@@ -34,6 +33,8 @@ public:
 
 	std::vector<int> GetTransitions() { return m_transitions; }
 
+	void SetVisibility(bool vis) { m_isRevealed = vis; }
+
 private:
 
 	Point2D m_mapPosition;
@@ -41,5 +42,7 @@ private:
 
 	std::vector<GameObject*> m_objects;
 	std::vector<int> m_transitions;
+
+	bool m_isRevealed;
 };
 

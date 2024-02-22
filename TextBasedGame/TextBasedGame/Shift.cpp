@@ -12,7 +12,7 @@ Shift::~Shift()
 {
 }
 
-bool Shift::Cast(Game* game, Player* pPlayer)
+void Shift::Cast(Game* game, Player* pPlayer)
 {
 	// Clear map display
 	std::cout << MAP_OUTPUT_POS << CSI << "15M" << CSI << "15L";
@@ -27,7 +27,6 @@ bool Shift::Cast(Game* game, Player* pPlayer)
 		game->GetRoom((int)(i / MAZE_WIDTH), i % MAZE_WIDTH).RandomiseTransitions(game);
 	}
 
-	game->Draw();
-
-	return true;
+	std::cout << EXTRA_OUTPUT_POS << MAGENTA << 
+		"You feel the pathways through the maze shift and change around you." << RESET_COLOR;
 }

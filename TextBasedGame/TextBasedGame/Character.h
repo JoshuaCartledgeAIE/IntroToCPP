@@ -14,7 +14,6 @@ public:
 
 	virtual void Draw() = 0;
 	virtual void DrawDescription() = 0;
-	virtual void LookAt() = 0;
 
 	float GetHP() { return m_healthPoints; }
 	float GetAT() { return m_attackPoints; }

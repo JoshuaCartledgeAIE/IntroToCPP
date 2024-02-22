@@ -23,7 +23,6 @@ public:
 
 	void Draw() override;
 	void DrawDescription() override;
-	void LookAt() override;
 
 private:
 	String m_name;

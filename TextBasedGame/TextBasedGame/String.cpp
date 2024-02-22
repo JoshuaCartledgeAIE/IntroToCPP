@@ -195,12 +195,12 @@ String String::Substring(int _startIndex, int _endIndex)
 {
     // check that indices are inside the bounds
     if (_startIndex < 0 || _endIndex > Length()) {
-        std::cout << "Substring error: out of bounds index!";
+        //std::cout << "Substring error: out of bounds index!";
         return String("");
     }
 
     if (_startIndex > _endIndex) {
-        std::cout << "Substring error: start index greater than end index!";
+        //std::cout << "Substring error: start index greater than end index!";
         return String("");
     }
 
@@ -317,8 +317,8 @@ char& String::operator [] (int _index)
 {
     // check if magnitude of index is too big for the size of the string
     if (_index >= Length() || -_index >= Length()) {
-        std::cout << "Out of bounds array index when attempting to access the string: '" << m_string << "' at index " << _index;
-        exit(0);
+        //std::cout << "Out of bounds array index when attempting to access the string: '" << m_string << "' at index " << _index;
+        return m_string[Length()]; // returns null terminator
     }
     
     // negative indexes start from the end of the string
@@ -335,8 +335,8 @@ const char& String::operator [] (int _index) const
 {
     // check if magnitude of index is too big for the size of the string
     if (_index >= Length() || -_index >= Length()) {
-        std::cout << "Out of bounds array index when attempting to access the string: '" << m_string << "' at index " << _index;
-        exit(0);
+        //std::cout << "Out of bounds array index when attempting to access the string: '" << m_string << "' at index " << _index;
+        return m_string[Length()]; // returns null terminator
     }
 
     // negative indexes start from the end of the string

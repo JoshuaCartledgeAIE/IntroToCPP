@@ -13,7 +13,6 @@ public:
 
 	void Draw() override;
 	void DrawDescription() override;
-	void LookAt() override;
 
 };
 
