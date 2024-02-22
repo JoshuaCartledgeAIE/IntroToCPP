@@ -37,6 +37,8 @@ private:
 
 	int GetCommand();
 
+	int GetCombatCommand();
+
 private:
 	bool m_gameOver;
 

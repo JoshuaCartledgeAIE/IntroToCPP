@@ -25,6 +25,7 @@ public:
 	float GetMana() { return m_manaPoints; }
 
 	bool IsInCombat() { return m_inCombat; }
+	void SetCombatState(bool combat) { m_inCombat = combat; }
 
 	void Draw() override;
 	void DrawDescription() override;
@@ -35,7 +36,7 @@ public:
 
 private:
 	void Pickup(Room* pRoom);
-	void Attack(Enemy* pEnemy);
+	void Attack(Enemy* pEnemy, bool isRisky);
 	void CastSpell(String spellName, Game* game);
 
 private:

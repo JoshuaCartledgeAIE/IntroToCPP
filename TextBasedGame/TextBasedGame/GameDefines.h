@@ -41,10 +41,11 @@ const int EAST = 6;
 const int SOUTH = 4;
 const int WEST = 8;
 
-const int FIGHT = 9;
-const int PICKUP = 10;
-const int CAST = 11;
-const int QUIT = 12;
+const int NORMAL_ATTACK = 9;
+const int RISKY_ATTACK = 10;
+const int PICKUP = 11;
+const int CAST = 12;
+const int QUIT = 13;
 
 const int VISION_RANGE = 1;
 

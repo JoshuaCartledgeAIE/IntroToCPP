@@ -139,8 +139,11 @@ void Player::ExecuteCommand(int command, Room* pRoom, String spellName, Game* ga
 			m_mapPosition.y++;
 		}
 		return;
-	case FIGHT:
-		Attack(pRoom->GetEnemy());
+	case NORMAL_ATTACK:
+		Attack(pRoom->GetEnemy(), false);
+		break;
+	case RISKY_ATTACK:
+		Attack(pRoom->GetEnemy(), true);
 		break;
 	case PICKUP:
 		Pickup(pRoom);
@@ -180,19 +183,33 @@ void Player::Pickup(Room* pRoom)
 	}
 }
 
-void Player::Attack(Enemy* pEnemy)
+void Player::Attack(Enemy* pEnemy, bool isRisky)
 {
 	if (pEnemy == nullptr) {
 		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "There is no one here to fight." << std::endl;
 	}
 	else {
+		std::cout << EXTRA_OUTPUT_POS;
 
+		int damageDealt = 0;
+		if (isRisky) {
+			if (rand() % 10 < 5) // 50% chance to hit
+				damageDealt = m_attackPoints * 2 + (rand() % 8) - 4;
+			else
+				std::cout << RED << "You missed your risky swing!" << std::endl;
+		}
+		else {
+			// regular attack (guaranteed hit)
+			damageDealt = m_attackPoints + (rand() % 4) - 2;
+		}
+		
 		// Tell enemy to take damage from the attack
-		pEnemy->OnAttacked(m_attackPoints);
+		if (damageDealt > 0)
+			pEnemy->OnAttacked(damageDealt);
 
 		// If enemy dies, tell the player
 		if (pEnemy->IsAlive() == false) {
-			std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You fight the grue and kill it!" << std::endl;
+			std::cout << GREEN << "You have killed the enemy!" << RESET_COLOR << std::endl;
 		}
 		else {
 			// Otherwise the enemy fights back
@@ -200,11 +217,11 @@ void Player::Attack(Enemy* pEnemy)
 			if (damage < 0) damage = 1 + rand() % 10;
 			m_healthPoints -= damage;
 
-			std::cout << EXTRA_OUTPUT_POS << RESET_COLOR <<
-				"You fight a grue and take " << damage <<
-				" points damage. Your health is now at " << m_healthPoints <<
+			std::cout << RESET_COLOR <<
+				"You fight the enemy and take " << damage <<
+				" damage. Your health is now at " << m_healthPoints <<
 				std::endl;
-			std::cout << INDENT << "The grue has " << pEnemy->GetHP() <<
+			std::cout << INDENT << "The enemy has " << pEnemy->GetHP() <<
 				" health remaining." << std::endl;
 		}
 	}
@@ -219,7 +236,7 @@ void Player::CastSpell(String spellName, Game* game)
 			// Check if spell is for the current state (combat or utility)
 			if (spell->IsForCombat() != m_inCombat) {
 				std::cout << EXTRA_OUTPUT_POS << RED <<
-					"Now is not the time to use that spell!" << std::endl;
+					"Now is not the time to use that spell!" << RESET_COLOR << std::endl;
 				return;
 			}
 			// Check if player has enough mana first

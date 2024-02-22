@@ -58,7 +58,17 @@ void Game::Update()
 		return;
 	}
 
-	int command = GetCommand();
+	// If player dies, exit game
+	if (m_player.IsAlive() == false) {
+		m_gameOver = true;
+		return;
+	}
+
+	int command = 0;
+	if (m_player.IsInCombat())
+		command = GetCombatCommand();
+	else
+		command = GetCommand();
 
 	if (command == QUIT) {
 		m_gameOver = true;
@@ -74,6 +84,15 @@ void Game::Update()
 			Point2D enemyPos = m_enemies[i].GetPosition();
 			m_map[enemyPos.y][enemyPos.x].RemoveGameObject(&m_enemies[i]);
 		}
+	}
+
+	// check if player is in a room with an enemy
+	playerPos = m_player.GetPosition();
+	if (m_map[playerPos.y][playerPos.x].GetEnemy() != nullptr) {
+		m_player.SetCombatState(true);
+	}
+	else {
+		m_player.SetCombatState(false);
 	}
 }
 
@@ -358,55 +377,92 @@ int Game::GetCommand()
 	String inputCommand;
 	// Read from console and convert to lowercase
 	inputCommand.ReadFromConsole();
-
+	inputCommand = inputCommand.ToLower();
 	m_spellName = "";
 
-	// Move command has a direction afterward
-	if (inputCommand.Find("W") == 0) {
+	
+	// Determine which command has been entered
+	if (inputCommand.Find("move") == 0) {
+		// Move command has a direction afterward
+		if (inputCommand.Find(4, "north") != -1) {
+			commandNo = NORTH;
+		}
+		else if (inputCommand.Find(4, "south") != -1) {
+			commandNo = SOUTH;
+		}
+		else if (inputCommand.Find(4, "west") != -1) {
+			commandNo = WEST;
+		}
+		else if (inputCommand.Find(4, "east") != -1) {
+			commandNo = EAST;
+		}
+		else return -1; // Invalid direction word
+	}
+	// Shorthands for move commands
+	else if (inputCommand.Find("w") == 0 && inputCommand.Length() == 1) {
 		commandNo = NORTH;
 	}
-	else if (inputCommand.Find("S") == 0) {
+	else if (inputCommand.Find("s") == 0 && inputCommand.Length() == 1) {
 		commandNo = SOUTH;
 	}
-	else if (inputCommand.Find("A") == 0) {
+	else if (inputCommand.Find("a") == 0 && inputCommand.Length() == 1) {
 		commandNo = WEST;
 	}
-	else if (inputCommand.Find("D") == 0) {
+	else if (inputCommand.Find("d") == 0 && inputCommand.Length() == 1) {
 		commandNo = EAST;
 	}
-	else {
-		inputCommand = inputCommand.ToLower();
-		// Determine which command has been entered
-		if (inputCommand.Find("move") == 0) {
-			// Move command has a direction afterward
-			if (inputCommand.Find(4, "north") != -1) {
-				commandNo = NORTH;
-			}
-			else if (inputCommand.Find(4, "south") != -1) {
-				commandNo = SOUTH;
-			}
-			else if (inputCommand.Find(4, "west") != -1) {
-				commandNo = WEST;
-			}
-			else if (inputCommand.Find(4, "east") != -1) {
-				commandNo = EAST;
-			}
-			else return -1; // Invalid direction word
-		}
-		else if (inputCommand.Find("fight") == 0) {
-			commandNo = FIGHT;
-		}
-		else if (inputCommand.Find("pickup") == 0) {
-			commandNo = PICKUP;
-		}
-		else if (inputCommand.Find("cast") == 0) {
-			commandNo = CAST;
-			m_spellName = inputCommand.Substring(5, inputCommand.Length());
-		}
-		else if (inputCommand.Find("exit") == 0) {
-			commandNo = QUIT;
-		}
+	else if (inputCommand.Find("pickup") == 0) {
+		commandNo = PICKUP;
+	}
+	else if (inputCommand.Find("cast") == 0) {
+		commandNo = CAST;
+		m_spellName = inputCommand.Substring(5, inputCommand.Length());
+	}
+	else if (inputCommand.Find("exit") == 0) {
+		commandNo = QUIT;
 	}
 	
+	return commandNo;
+}
+
+int Game::GetCombatCommand()
+{
+	// jump to the correct location
+	std::cout << CSI << PLAYER_INPUT_Y << ";" << 0 << "H";
+	// clear any existing text
+	std::cout << CSI << "5M";
+	// insert 5 blank lines to ensure the inventory output remains correct
+	std::cout << CSI << "5L";
+
+	std::cout << INDENT << "Enter a command: ";
+	int commandNo = 0;
+	// move cursor to position for player to enter input
+	std::cout << CSI << PLAYER_INPUT_Y << ";" << PLAYER_INPUT_X << "H" << YELLOW;
+	// clear the input buffer, ready for player input
+	std::cin.clear();
+	std::cin.ignore(std::cin.rdbuf()->in_avail());
+
+	String inputCommand;
+	// Read from console and convert to lowercase
+	inputCommand.ReadFromConsole();
+	inputCommand = inputCommand.ToLower();
+	m_spellName = "";
+
+
+	// Determine which command has been entered
+	if (inputCommand.Find("normal") == 0 || inputCommand.Find("normal attack") == 0) {
+		commandNo = NORMAL_ATTACK;
+	}
+	else if (inputCommand.Find("risky") == 0 || inputCommand.Find("risky attack") == 0) {
+		commandNo = RISKY_ATTACK;
+	}
+	else if (inputCommand.Find("cast") == 0) {
+		commandNo = CAST;
+		m_spellName = inputCommand.Substring(5, inputCommand.Length());
+	}
+	else if (inputCommand.Find("exit") == 0) {
+		commandNo = QUIT;
+	}
+
 	return commandNo;
 }
