@@ -4,7 +4,6 @@
 #include "Player.h"
 
 class Enemy;
-class Food;
 class Item;
 
 class Game {
@@ -33,6 +32,7 @@ private:
 	void DrawMap();
 	void DrawMapBorders();
 	void DrawLegend();
+	void DrawCommands();
 	void DrawValidDirections();
 
 	int GetCommand();
@@ -46,9 +46,6 @@ private:
 
 	int m_enemyCount;
 	Enemy* m_enemies;
-
-	int m_foodCount;
-	Food* m_food;
 
 	int m_ItemCount;
 	Item* m_Items;

@@ -45,7 +45,7 @@ private:
 
 	float m_maxHP = 100.0f;
 	float m_maxMP = 80.0f;
-	const int BASE_AT = 20;
+	const int BASE_AT = 15;
 	const int BASE_DF = 5;
 
 	std::vector<Spell*> m_spells;

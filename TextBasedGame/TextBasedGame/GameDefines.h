@@ -14,7 +14,7 @@ const char* const RESET_COLOR = "\x1b[0m";
 const char* const STATS_OUTPUT_POS = "\x1b[2;6H";
 const char* const MAP_OUTPUT_POS = "\x1b[3;6H";
 const char* const EXTRA_OUTPUT_POS = "\x1b[22;6H";
-const char* const INVENTORY_OUTPUT_POS = "\x1b[29;6H";
+const char* const INVENTORY_OUTPUT_POS = "\x1b[31;6H";
 
 // room types
 const int EMPTY = 0;
@@ -22,7 +22,7 @@ const int ENTRANCE = EMPTY + 1;
 const int EXIT = ENTRANCE + 1;
 
 const int WINDOW_HEIGHT = 60;
-const int WINDOW_WIDTH = 150;
+const int WINDOW_WIDTH = 200;
 
 const int MAZE_WIDTH = 15;
 const int MAZE_HEIGHT = 7;
@@ -46,6 +46,7 @@ const int RISKY_ATTACK = 10;
 const int PICKUP = 11;
 const int CAST = 12;
 const int QUIT = 13;
+const int COMBAT_FAIL = 14;
 
 const int VISION_RANGE = 1;
 
@@ -63,3 +64,6 @@ const int PRIORITY_PLAYER = 0;
 const int PRIORITY_ENEMY = 1;
 const int PRIORITY_ITEM = 2;
 const int PRIORITY_FOOD = 3;
+
+// Possible Enemy Attack Intents
+const enum EnemyAttack {WEAK, MED, STRONG, DEBUFF, STEAL, ESCAPE};

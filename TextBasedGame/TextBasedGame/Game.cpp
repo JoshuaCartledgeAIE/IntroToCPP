@@ -9,6 +9,7 @@
 #include "Enemy.h"
 #include "Item.h"
 #include <vector>
+#include "BasicEnemy.h"
 
 
 Game::Game() : m_gameOver{false}
@@ -19,7 +20,6 @@ Game::~Game()
 {
 	delete[] m_Items;
 	delete[] m_enemies;
-	delete[] m_food;
 }
 
 bool Game::Startup()
@@ -101,8 +101,9 @@ void Game::Draw()
 	// Get player position
 	Point2D playerPos = m_player.GetPosition();
 
-	// List the valid directions the player can travel
-	DrawValidDirections();
+	// List the valid directions the player can travel (if not in combat)
+	if (!m_player.IsInCombat())
+		DrawValidDirections();
 	
 	m_map[playerPos.y][playerPos.x].DrawDescription();
 
@@ -168,9 +169,9 @@ void Game::InitializeMap()
 
 void Game::InitializeEnemies()
 {
-	// Add a random number of enemies between 8 and 10
-	m_enemyCount = 8 + rand() % 3;
-	m_enemies = new Enemy[m_enemyCount];
+	// Add a random number of enemies between 12 and 15
+	m_enemyCount = 12 + rand() % 4;
+	m_enemies = new BasicEnemy[m_enemyCount];
 
 	for (int i = 0; i < m_enemyCount; i++) {
 		// spawn enemies at random position (not near entrance)
@@ -256,11 +257,15 @@ void Game::DrawMap()
 	DrawMapBorders();
 
 	DrawLegend();
+	DrawCommands();
 }
 
 void Game::DrawMapBorders() {
+	// set border color based on current combat state
+	String borderColor = m_player.IsInCombat() ? RED : YELLOW;
+
 	// Draw top map border
-	std::cout << YELLOW << MAP_OUTPUT_POS << "\xC9";
+	std::cout << borderColor << MAP_OUTPUT_POS << "\xC9";
 	for (int i = 0; i < MAZE_WIDTH * 5 - 1; i++) {
 		std::cout << "\xCD";
 	}
@@ -290,8 +295,10 @@ void Game::DrawMapBorders() {
 
 void Game::DrawLegend()
 {
-	// Position cursor right of map
-	std::cout << CSI << "6;" << MAZE_WIDTH * 5 + 11 << "H";
+	// Position cursor right of map at top
+	std::cout << CSI << "3;" << MAZE_WIDTH * 5 + 11 << "H";
+
+	// Write definitions of each symbol on the map
 	std::cout << YELLOW << "Map Legend:" << RESET_COLOR << std::endl;
 	std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
 
@@ -304,7 +311,7 @@ void Game::DrawLegend()
 	std::cout << GREEN << "\xb1" << RESET_COLOR << " = Empty" << std::endl;
 	std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
 
-	std::cout << RED << "\x94" << RESET_COLOR << " = Enemy" << std::endl;
+	std::cout << RED << "\x94, \x8B, \x99" << RESET_COLOR << " = Enemies" << std::endl;
 	std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
 
 	std::cout << YELLOW << "$" << RESET_COLOR << " = Treasure" << std::endl;
@@ -314,13 +321,52 @@ void Game::DrawLegend()
 	
 }
 
+void Game::DrawCommands()
+{
+	// Position cursor right of map
+	std::cout << CSI << "11;" << MAZE_WIDTH * 5 + 11 << "H";
+	std::cout << YELLOW << "Commands:" << RESET_COLOR << std::endl;
+	std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
+
+	// Depending on if player is in combat, write available commands
+	if (m_player.IsInCombat()) {
+		std::cout << MAGENTA << "normal" << RESET_COLOR << " OR " << MAGENTA
+			<< "attack" << RESET_COLOR << ": Performs a normal attack (deals damage equal to your AT stat)" << std::endl;
+		std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
+
+		std::cout << MAGENTA << "risky" << RESET_COLOR << ": Performs a risky attack (deals 2xAT damage, but 50% chance to miss)" << std::endl;
+		std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
+
+		std::cout << MAGENTA << "cast spellName" << RESET_COLOR << ": casts the named spell (see known spells below)" << std::endl;
+		std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
+
+		std::cout << MAGENTA << "exit" << RESET_COLOR << ": Quits the game" << std::endl;
+		std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
+	}
+	else {
+		std::cout << MAGENTA << "move north/south/east/west" << RESET_COLOR << " OR " << MAGENTA
+			<<  "w / a / s / d"  << RESET_COLOR << ": Moves player in the specified direction on the map" << std::endl;
+		std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
+
+		std::cout << MAGENTA << "pickup" << RESET_COLOR << ": Moves player in the specified direction on the map" << std::endl;
+		std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
+
+		std::cout << MAGENTA << "cast spellName" << RESET_COLOR << ": casts the named spell (see known spells below)" << std::endl;
+		std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
+
+		std::cout << MAGENTA << "exit" << RESET_COLOR << ": Quits the game" << std::endl;
+		std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
+	}
+	
+}
+
 void Game::DrawValidDirections()
 {
 	// reset draw colors
 	std::cout << RESET_COLOR;
 	// jump to the correct location
 	std::cout << CSI << MOVEMENT_DESC_Y + 1 << ";" << 0 << "H";
-	// Delete 1 lines and insert 1 line
+	// Delete 1 line and insert 1 line
 	std::cout << CSI << "1M" << CSI << "1L";
 
 	int dirCount = m_map[m_player.GetPosition().y][m_player.GetPosition().x].GetTransitions().size();
@@ -362,9 +408,9 @@ int Game::GetCommand()
 	// jump to the correct location
 	std::cout << CSI << PLAYER_INPUT_Y << ";" << 0 << "H";
 	// clear any existing text
-	std::cout << CSI << "5M";
-	// insert 5 blank lines to ensure the inventory output remains correct
-	std::cout << CSI << "5L";
+	std::cout << CSI << "7M";
+	// insert 7 blank lines to ensure the inventory output remains correct
+	std::cout << CSI << "7L";
 
 	std::cout << INDENT << "Enter a command: ";
 	int commandNo = 0;
@@ -430,9 +476,9 @@ int Game::GetCombatCommand()
 	// jump to the correct location
 	std::cout << CSI << PLAYER_INPUT_Y << ";" << 0 << "H";
 	// clear any existing text
-	std::cout << CSI << "5M";
-	// insert 5 blank lines to ensure the inventory output remains correct
-	std::cout << CSI << "5L";
+	std::cout << CSI << "7M";
+	// insert 7 blank lines to ensure the inventory output remains correct
+	std::cout << CSI << "7L";
 
 	std::cout << INDENT << "Enter a command: ";
 	int commandNo = 0;
@@ -450,7 +496,8 @@ int Game::GetCombatCommand()
 
 
 	// Determine which command has been entered
-	if (inputCommand.Find("normal") == 0 || inputCommand.Find("normal attack") == 0) {
+	if (inputCommand.Find("normal") == 0 || inputCommand.Find("normal attack") == 0
+		|| inputCommand.Find("attack") == 0) {
 		commandNo = NORMAL_ATTACK;
 	}
 	else if (inputCommand.Find("risky") == 0 || inputCommand.Find("risky attack") == 0) {
@@ -462,6 +509,9 @@ int Game::GetCombatCommand()
 	}
 	else if (inputCommand.Find("exit") == 0) {
 		commandNo = QUIT;
+	}
+	else {
+		commandNo = COMBAT_FAIL;
 	}
 
 	return commandNo;

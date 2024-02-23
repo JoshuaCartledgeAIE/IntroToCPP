@@ -67,15 +67,11 @@ void Player::Draw()
 	std::cout << CSI << outPos.y << ";" << outPos.x << "H";
 	std::cout << MAGENTA << "\x81" << RESET_COLOR;
 
-	// Draw inventory
-	std::cout << INVENTORY_OUTPUT_POS << CSI << "15M"; 
-	std::cout << INVENTORY_OUTPUT_POS << YELLOW << "Inventory: " << RESET_COLOR;
-	for (auto iter = m_Items.begin(); iter < m_Items.end(); iter++) {
-		std::cout << (*iter)->GetName() << "\t";
-	}
+	
+	std::cout << INVENTORY_OUTPUT_POS << CSI << "15M";
 
 	// Draw spellbook
-	std::cout << std::endl << std::endl << INDENT << YELLOW;
+	std::cout << INVENTORY_OUTPUT_POS << YELLOW;
 	if (m_inCombat)
 		std::cout << "Known Combat Spells:";
 	else
@@ -88,6 +84,13 @@ void Player::Draw()
 			std::cout << INDENT << INDENT <<
 				(*iter)->GetName() << ": " << (*iter)->GetDescription() << std::endl;
 		}
+	}
+
+	// Draw inventory
+	std::cout << std::endl << std::endl << INDENT;
+	std::cout << YELLOW << "Inventory: " << RESET_COLOR << std::endl;
+	for (auto iter = m_Items.begin(); iter < m_Items.end(); iter++) {
+		std::cout << INDENT << INDENT << (*iter)->GetName() << std::endl;
 	}
 }
 
@@ -151,9 +154,12 @@ void Player::ExecuteCommand(int command, Room* pRoom, String spellName, Game* ga
 	case CAST:
 		CastSpell(spellName, game);
 		break;
+	case COMBAT_FAIL:
+		std::cout << EXTRA_OUTPUT_POS << RED << "You're in combat, you can't do that right now!" << RESET_COLOR << std::endl;
+		break;
 	default:
 		// the command was not valid so do nothing
-		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You try, but you just can't do it." << std::endl;
+		std::cout << EXTRA_OUTPUT_POS << RED << "You try, but you just can't do it." << RESET_COLOR << std::endl;
 		break;
 	}
 
@@ -185,6 +191,7 @@ void Player::Pickup(Room* pRoom)
 
 void Player::Attack(Enemy* pEnemy, bool isRisky)
 {
+
 	if (pEnemy == nullptr) {
 		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "There is no one here to fight." << std::endl;
 	}
@@ -194,35 +201,37 @@ void Player::Attack(Enemy* pEnemy, bool isRisky)
 		int damageDealt = 0;
 		if (isRisky) {
 			if (rand() % 10 < 5) // 50% chance to hit
-				damageDealt = m_attackPoints * 2 + (rand() % 8) - 4;
+				damageDealt = m_attackPoints * 2 + (rand() % 8) - 4; // large variance in damage (+-4dmg)
 			else
 				std::cout << RED << "You missed your risky swing!" << std::endl;
 		}
 		else {
 			// regular attack (guaranteed hit)
-			damageDealt = m_attackPoints + (rand() % 4) - 2;
+			damageDealt = m_attackPoints + (rand() % 4) - 2; // small variance in damage (+-2dmg)
 		}
-		
+
 		// Tell enemy to take damage from the attack
-		if (damageDealt > 0)
-			pEnemy->OnAttacked(damageDealt);
+		if (damageDealt > 0) {
+			int actualDmgDealt = pEnemy->OnAttacked(damageDealt);
+			std::cout << RESET_COLOR <<
+				"You hit the enemy, dealing " << YELLOW << actualDmgDealt <<
+				" damage." << RESET_COLOR << std::endl
+				<< INDENT << "The enemy has " << pEnemy->GetHP() <<
+				" health remaining." << std::endl;
+		}
+
 
 		// If enemy dies, tell the player
 		if (pEnemy->IsAlive() == false) {
-			std::cout << GREEN << "You have killed the enemy!" << RESET_COLOR << std::endl;
+			std::cout << INDENT << GREEN << "You have killed the enemy!" << RESET_COLOR << std::endl;
 		}
 		else {
-			// Otherwise the enemy fights back
-			int damage = pEnemy->GetAT() - m_defendPoints;
-			if (damage < 0) damage = 1 + rand() % 10;
-			m_healthPoints -= damage;
-
-			std::cout << RESET_COLOR <<
-				"You fight the enemy and take " << damage <<
-				" damage. Your health is now at " << m_healthPoints <<
-				std::endl;
-			std::cout << INDENT << "The enemy has " << pEnemy->GetHP() <<
-				" health remaining." << std::endl;
+			// Otherwise the enemy does their chosen attack intent
+			int damageTaken = pEnemy->Attack(this);
+			if (damageTaken != -1){
+				// if the attack involves taking damage, take the damage
+				m_healthPoints -= damageTaken;
+			}
 		}
 	}
 }
