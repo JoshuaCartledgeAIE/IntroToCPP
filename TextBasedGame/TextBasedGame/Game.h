@@ -17,7 +17,8 @@ public:
 	void Draw();
 	bool IsGameOver();
 
-	Room& GetRoom(int x, int y);
+	Room& GetRoom(int y, int x) { return m_map[y][x]; }
+	Room& GetRoom(Point2D pos) { return m_map[pos.y][pos.x]; }
 	Player* GetPlayer() { return &m_player; }
 
 private:

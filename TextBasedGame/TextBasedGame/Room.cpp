@@ -153,7 +153,7 @@ void Room::RandomiseTransitions(Game* game)
 	int tCount = rand() % 3 + 1; // add random number of transitions between 1 and 4
 	int emergencyExit = 0;
 	while (m_transitions.size() < tCount) {
-		int dirToAdd = (rand() % 4 + 1) * 2;
+		int dirToAdd = rand() % 4;
 		// Ensure that transition is not already in the vector before adding
 		if (std::find(m_transitions.begin(), m_transitions.end(), dirToAdd) == m_transitions.end()) {
 			AddTransition(dirToAdd, game, true);

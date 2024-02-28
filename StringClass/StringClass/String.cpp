@@ -3,7 +3,7 @@
 
 String::String()
 {
-    m_string = new char[1];
+    m_string = new char[1] {'\0'};
 }
 
 String::String(const char* _str)
@@ -101,7 +101,6 @@ void String::Append(const String& _str)
 
     // Reallocate the memory
     delete[] m_string;
-    m_string = new char[Length() + _str.Length() + 1];
     m_string = temp;
 }
 
@@ -115,7 +114,6 @@ void String::Prepend(const String& _str)
 
     // Reallocate the memory
     delete[] m_string;
-    m_string = new char[Length() + _str.Length() + 1];
     m_string = temp;
 }
 
@@ -261,6 +259,8 @@ const char* String::CStr() const
 
 void String::operator = (const String& other)
 {
+    delete[] m_string;
+
     // This is just the same code as the copy constructor above
     m_string = new char[other.Length() + 1];
 

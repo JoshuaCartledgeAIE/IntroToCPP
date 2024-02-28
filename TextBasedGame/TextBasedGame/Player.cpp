@@ -10,7 +10,10 @@
 #include "Character.h"
 #include "Shift.h"
 #include "Teleport.h"
+#include "Earthquake.h"
 #include "Game.h"
+#include "LightningBolt.h"
+#include "Fireball.h"
 
 Player::Player() : Character{{0,0}, m_maxHP, BASE_AT, BASE_DF}, m_inCombat{false}
 {
@@ -107,6 +110,18 @@ void Player::LearnSpell(String spellName)
 	}
 	else if (spellName == "Teleport") {
 		Teleport* spell = new Teleport;
+		m_spells.push_back(spell);
+	}
+	else if (spellName == "Earthquake") {
+		Earthquake* spell = new Earthquake;
+		m_spells.push_back(spell);
+	}
+	else if (spellName == "Lightning Bolt") {
+		LightningBolt* spell = new LightningBolt;
+		m_spells.push_back(spell);
+	}
+	else if (spellName == "Fireball") {
+		Fireball* spell = new Fireball;
 		m_spells.push_back(spell);
 	}
 	else {
@@ -213,10 +228,13 @@ void Player::Attack(Enemy* pEnemy, bool isRisky)
 		// Tell enemy to take damage from the attack
 		if (damageDealt > 0) {
 			int actualDmgDealt = pEnemy->OnAttacked(damageDealt);
+			// Report how much damage was dealt and enemy's remaining health
 			std::cout << RESET_COLOR <<
 				"You hit the enemy, dealing " << YELLOW << actualDmgDealt <<
-				" damage." << RESET_COLOR << std::endl
-				<< INDENT << "The enemy has " << pEnemy->GetHP() <<
+				" damage." << RESET_COLOR << std::endl;
+			
+			if (pEnemy->IsAlive())
+				std::cout << INDENT << "The enemy has " << pEnemy->GetHP() <<
 				" health remaining." << std::endl;
 		}
 
@@ -256,8 +274,13 @@ void Player::CastSpell(String spellName, Game* game)
 				return;
 			}
 			// Cast the spell and spend the mana
-			spell->Cast(game, game->GetPlayer());
+			spell->Cast(game, this);
 			m_manaPoints -= spell->GetCost();
+
+			// If spell was cast in combat, enemy now fights back
+			if (m_inCombat) {
+				game->GetRoom(m_mapPosition).GetEnemy()->Attack(this);
+			}
 
 			// Redraw game and player to update any changes that the spells made
 			game->Draw();

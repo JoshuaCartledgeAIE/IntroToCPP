@@ -3,7 +3,7 @@
 
 String::String()
 {
-    m_string = new char[1];
+    m_string = new char[1] {'\0'};
 }
 
 String::String(const char* _str)
@@ -101,7 +101,6 @@ void String::Append(const String& _str)
 
     // Reallocate the memory
     delete[] m_string;
-    m_string = new char[Length() + _str.Length() + 1];
     m_string = temp;
 }
 
@@ -115,7 +114,6 @@ void String::Prepend(const String& _str)
 
     // Reallocate the memory
     delete[] m_string;
-    m_string = new char[Length() + _str.Length() + 1];
     m_string = temp;
 }
 
@@ -196,12 +194,12 @@ String String::Substring(int _startIndex, int _endIndex)
     // check that indices are inside the bounds
     if (_startIndex < 0 || _endIndex > Length()) {
         //std::cout << "Substring error: out of bounds index!";
-        return String("");
+        return String();
     }
 
     if (_startIndex > _endIndex) {
         //std::cout << "Substring error: start index greater than end index!";
-        return String("");
+        return String();
     }
 
     // create temp array to store the substring
@@ -212,8 +210,9 @@ String String::Substring(int _startIndex, int _endIndex)
         temp[i - _startIndex] = m_string[i];
     }
     temp[_endIndex - _startIndex] = '\0';
-
-    return String(temp);
+    String tempString = temp;
+    delete[] temp;
+    return tempString;
 }
 
 void String::Replace(const String& _find, const String& _replace)
@@ -260,6 +259,8 @@ const char* String::CStr() const
 
 void String::operator = (const String& other)
 {
+    delete[] m_string;
+
     // This is just the same code as the copy constructor above
     m_string = new char[other.Length() + 1];
 
@@ -318,7 +319,7 @@ char& String::operator [] (int _index)
     // check if magnitude of index is too big for the size of the string
     if (_index >= Length() || -_index >= Length()) {
         //std::cout << "Out of bounds array index when attempting to access the string: '" << m_string << "' at index " << _index;
-        return m_string[Length()]; // returns null terminator
+        return m_string[Length()];
     }
     
     // negative indexes start from the end of the string
@@ -336,7 +337,7 @@ const char& String::operator [] (int _index) const
     // check if magnitude of index is too big for the size of the string
     if (_index >= Length() || -_index >= Length()) {
         //std::cout << "Out of bounds array index when attempting to access the string: '" << m_string << "' at index " << _index;
-        return m_string[Length()]; // returns null terminator
+        return m_string[Length()];
     }
 
     // negative indexes start from the end of the string

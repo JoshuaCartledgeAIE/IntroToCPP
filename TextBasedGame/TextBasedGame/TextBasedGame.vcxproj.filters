@@ -28,12 +28,12 @@
     <Filter Include="Header Files\Enemies">
       <UniqueIdentifier>{1296938b-ab1f-4808-9993-6c0caa52dc7d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Enemies">
+      <UniqueIdentifier>{b48eee0e-e1a9-45c7-87c3-1f4e242b6447}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Character.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Enemy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Game.cpp">
@@ -46,9 +46,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Room.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="String.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TextBasedGame.cpp">
@@ -66,8 +63,23 @@
     <ClCompile Include="Teleport.cpp">
       <Filter>Source Files\Spells</Filter>
     </ClCompile>
+    <ClCompile Include="LightningBolt.cpp">
+      <Filter>Source Files\Spells</Filter>
+    </ClCompile>
+    <ClCompile Include="Enemy.cpp">
+      <Filter>Source Files\Enemies</Filter>
+    </ClCompile>
     <ClCompile Include="BasicEnemy.cpp">
+      <Filter>Source Files\Enemies</Filter>
+    </ClCompile>
+    <ClCompile Include="String.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Fireball.cpp">
+      <Filter>Source Files\Spells</Filter>
+    </ClCompile>
+    <ClCompile Include="Earthquake.cpp">
+      <Filter>Source Files\Spells</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -112,6 +124,15 @@
     </ClInclude>
     <ClInclude Include="BasicEnemy.h">
       <Filter>Header Files\Enemies</Filter>
+    </ClInclude>
+    <ClInclude Include="LightningBolt.h">
+      <Filter>Header Files\Spells</Filter>
+    </ClInclude>
+    <ClInclude Include="Fireball.h">
+      <Filter>Header Files\Spells</Filter>
+    </ClInclude>
+    <ClInclude Include="Earthquake.h">
+      <Filter>Header Files\Spells</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

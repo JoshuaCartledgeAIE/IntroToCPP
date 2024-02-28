@@ -2,19 +2,25 @@
 const char* const ESC = "\x1b";
 const char* const CSI = "\x1b[";
 
+// Screen Positions
 const char* const TITLE = "\x1b[1;20H";
 const char* const INDENT = "\x1b[5C";
-const char* const YELLOW = "\x1b[93m";
-const char* const MAGENTA = "\x1b[95m";
-const char* const RED = "\x1b[91m";
-const char* const BLUE = "\x1b[94m";
-const char* const WHITE = "\x1b[97m";
-const char* const GREEN = "\x1b[92m";
 const char* const RESET_COLOR = "\x1b[0m";
 const char* const STATS_OUTPUT_POS = "\x1b[2;6H";
 const char* const MAP_OUTPUT_POS = "\x1b[3;6H";
-const char* const EXTRA_OUTPUT_POS = "\x1b[22;6H";
+const char* const EXTRA_OUTPUT_POS = "\x1b[23;6H";
 const char* const INVENTORY_OUTPUT_POS = "\x1b[31;6H";
+
+// Colors
+const char* const YELLOW = "\x1b[38;5;228m";
+const char* const MAGENTA = "\x1b[38;5;164m";
+const char* const ORANGE = "\x1b[38;5;208m";
+const char* const RED = "\x1b[38;5;160m";
+const char* const DARK_RED = "\x1b[38;5;88m";
+const char* const BLUE = "\x1b[38;5;20m";
+const char* const WHITE = "\x1b[38;5;15m";
+const char* const GREEN = "\x1b[38;5;34m";
+const char* const GREY = "\x1b[38;5;243m";
 
 // room types
 const int EMPTY = 0;
@@ -36,10 +42,10 @@ const int PLAYER_INPUT_X = 30;
 const int PLAYER_INPUT_Y = 21;
 
 // input commands
-const int NORTH = 2;
-const int EAST = 6;
-const int SOUTH = 4;
-const int WEST = 8;
+const int NORTH = 0;
+const int EAST = 1;
+const int SOUTH = 2;
+const int WEST = 3;
 
 const int NORMAL_ATTACK = 9;
 const int RISKY_ATTACK = 10;

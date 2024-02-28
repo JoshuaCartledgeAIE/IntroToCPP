@@ -23,6 +23,7 @@ public:
 	Point2D GetPosition() { return m_mapPosition; };
 
 	float GetMana() { return m_manaPoints; }
+	float GetMaxMP() { return m_maxMP; }
 
 	bool IsInCombat() { return m_inCombat; }
 	void SetCombatState(bool combat) { m_inCombat = combat; }

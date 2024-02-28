@@ -30,6 +30,9 @@ int Enemy::OnAttacked(int damageDealt)
 
 int Enemy::Attack(Player* pPlayer)
 {
+	// Make sure a dead enemy doesn't attack!
+	if (!IsAlive()) { return -1; }
+
 	int damage = 0;
 	// Act on attack intent
 	switch (m_nextAttack)
@@ -75,7 +78,7 @@ int Enemy::Attack(Player* pPlayer)
 	}
 
 	// Switch intent to the next attack in the sequence
-	m_seqIndex = (m_seqIndex + 1) % 3;
+	m_seqIndex = (m_seqIndex + 1) % m_attackSequence.size();
 	m_nextAttack = m_attackSequence[m_seqIndex];
 
 	return damage;

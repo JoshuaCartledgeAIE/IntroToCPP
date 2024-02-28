@@ -43,6 +43,9 @@ bool Game::Startup()
 	// Have player learn first spell
 	m_player.LearnSpell(String("Shift"));
 	m_player.LearnSpell(String("Teleport"));
+	m_player.LearnSpell(String("Earthquake"));
+	m_player.LearnSpell(String("Lightning Bolt"));
+	m_player.LearnSpell(String("Fireball"));
 
 	return true;
 }
@@ -119,11 +122,6 @@ void Game::Draw()
 bool Game::IsGameOver()
 {
 	return m_gameOver;
-}
-
-Room& Game::GetRoom(int y, int x)
-{
-	return m_map[y][x];
 }
 
 bool Game::EnableVirtualTerminal()
@@ -311,7 +309,8 @@ void Game::DrawLegend()
 	std::cout << GREEN << "\xb1" << RESET_COLOR << " = Empty" << std::endl;
 	std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
 
-	std::cout << RED << "\x94, \x8B, \x99" << RESET_COLOR << " = Enemies" << std::endl;
+	std::cout << RED << "\x94" << WHITE << ", " << ORANGE << "\x8B" << WHITE << ", "
+		<< DARK_RED << "\x99" << RESET_COLOR << " = Enemies" << std::endl;
 	std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
 
 	std::cout << YELLOW << "$" << RESET_COLOR << " = Treasure" << std::endl;
