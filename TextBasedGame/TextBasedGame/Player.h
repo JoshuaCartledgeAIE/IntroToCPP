@@ -22,8 +22,19 @@ public:
 	void SetPosition(const Point2D& position) { m_mapPosition = position;}
 	Point2D GetPosition() { return m_mapPosition; };
 
-	float GetMana() { return m_manaPoints; }
+	float GetAT() { return m_attackPoints; }
+	float GetDF() { return m_defendPoints; }
+	float GetHP() { return m_healthPoints; }
+	float GetMaxHP() { return m_maxHP; }
+	float GetMP() { return m_manaPoints; }
 	float GetMaxMP() { return m_maxMP; }
+
+	void SetMaxMP(int value) { m_maxMP = value;}
+	void SetMaxHP(int value) { m_maxHP = value;}
+	void SetMP(int value) { m_manaPoints = value;}
+	void SetHP(int value) { m_healthPoints = value; }
+	void SetAT(int value) { m_attackPoints = value; }
+	void SetDF(int value) { m_defendPoints = value; }
 
 	bool IsInCombat() { return m_inCombat; }
 	void SetCombatState(bool combat) { m_inCombat = combat; }
@@ -37,7 +48,7 @@ public:
 
 private:
 	void Pickup(Room* pRoom);
-	void Attack(Enemy* pEnemy, bool isRisky);
+	void Attack(Enemy* pEnemy, Game* game, bool isRisky);
 	void CastSpell(String spellName, Game* game);
 
 private:
@@ -46,8 +57,6 @@ private:
 
 	float m_maxHP = 100.0f;
 	float m_maxMP = 80.0f;
-	const int BASE_AT = 15;
-	const int BASE_DF = 5;
 
 	std::vector<Spell*> m_spells;
 

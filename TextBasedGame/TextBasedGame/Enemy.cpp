@@ -1,14 +1,15 @@
 #include "Enemy.h"
 #include "Character.h"
+#include "Game.h"
 #include <iostream>
 
-Enemy::Enemy() : Character{ {0,0}, 40, 15, 5 }, m_nextAttack{ ESCAPE }, m_seqIndex{ 0 }
+Enemy::Enemy() : Character{ {0,0}, 40, 15, 5 }, m_nextAttack{ ESCAPE }, m_seqIndex{ 0 }, m_itemDropChance{0}
 {
 	m_priority = PRIORITY_ENEMY;
 }
 
-Enemy::Enemy(Point2D pos, int HP, int AT, int DF, String name) :
-	Character{ pos, HP, AT, DF }, m_name{ name }, m_nextAttack{ESCAPE}, m_seqIndex{ 0 }
+Enemy::Enemy(Point2D pos, int HP, int AT, int DF, String name, float chance) :
+	Character{ pos, HP, AT, DF }, m_name{ name }, m_nextAttack{ESCAPE}, m_seqIndex{ 0 }, m_itemDropChance{chance}
 {
 	m_priority = PRIORITY_ENEMY;
 }
@@ -82,6 +83,27 @@ int Enemy::Attack(Player* pPlayer)
 	m_nextAttack = m_attackSequence[m_seqIndex];
 
 	return damage;
+}
+
+void Enemy::OnDeath(Game* game)
+{
+	// Let player know that the enemy died
+	std::cout << INDENT << GREEN << "You killed the " << m_name << "!" << RESET_COLOR << std::endl << INDENT;
+	
+	// Either drop an item or some MP
+	if ((rand() % 100) / 100.0f < m_itemDropChance) {
+		std::cout << YELLOW << "The enemy dropped an item! (use the 'pickup' command to grab it!)" << RESET_COLOR << std::endl;
+	}
+	else {
+		Player* player = game->GetPlayer();
+
+		// Increase players MP by random amount (capping it at max MP)
+		int MPGain = rand() % 5 + 1;
+		player->SetMP(player->GetMP() + MPGain);
+		if (player->GetMP() > player->GetMaxMP()) { player->SetMP(player->GetMaxMP()); }
+		std::cout << "You gained " << BLUE << MPGain << "MP!" << RESET_COLOR;
+	}
+	std::cout << std::endl;
 }
 
 

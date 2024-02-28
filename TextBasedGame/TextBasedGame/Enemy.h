@@ -4,17 +4,20 @@
 #include "String.h"
 #include "GameDefines.h"
 #include "Player.h"
+#include "Item.h"
 
 class Enemy : public Character
 {
 public:
 	Enemy();
-	Enemy(Point2D pos, int HP, int AT, int DF, String name);
+	Enemy(Point2D pos, int HP, int AT, int DF, String name, float chance);
 	~Enemy();
 
 
 	int OnAttacked(int damageDealt);
 	int Attack(Player* pPlayer);
+
+	void OnDeath(Game* game);
 
 	virtual void Draw() = 0;
 	void DrawDescription() override;
@@ -24,5 +27,6 @@ protected:
 	EnemyAttack m_nextAttack;
 	int m_seqIndex;
 	std::vector<EnemyAttack> m_attackSequence;
+	float m_itemDropChance;
 };
 

@@ -140,6 +140,7 @@
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="Shift.cpp" />
     <ClCompile Include="Spell.cpp" />
+    <ClCompile Include="StatBooster.cpp" />
     <ClCompile Include="String.cpp" />
     <ClCompile Include="Teleport.cpp" />
     <ClCompile Include="TextBasedGame.cpp" />
@@ -160,6 +161,7 @@
     <ClInclude Include="Room.h" />
     <ClInclude Include="Shift.h" />
     <ClInclude Include="Spell.h" />
+    <ClInclude Include="StatBooster.h" />
     <ClInclude Include="String.h" />
     <ClInclude Include="Teleport.h" />
   </ItemGroup>

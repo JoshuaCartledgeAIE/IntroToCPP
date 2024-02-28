@@ -81,6 +81,9 @@
     <ClCompile Include="Earthquake.cpp">
       <Filter>Source Files\Spells</Filter>
     </ClCompile>
+    <ClCompile Include="StatBooster.cpp">
+      <Filter>Source Files\Items</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Character.h">
@@ -133,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="Earthquake.h">
       <Filter>Header Files\Spells</Filter>
+    </ClInclude>
+    <ClInclude Include="StatBooster.h">
+      <Filter>Header Files\Items</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

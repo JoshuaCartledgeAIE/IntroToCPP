@@ -2,6 +2,7 @@
 #include "GameDefines.h"
 #include "Room.h"
 #include "Player.h"
+#include <vector>
 
 class Enemy;
 class Item;
@@ -45,11 +46,9 @@ private:
 
 	Room m_map[MAZE_HEIGHT][MAZE_WIDTH];
 
-	int m_enemyCount;
-	Enemy* m_enemies;
+	std::vector<Enemy*> m_enemies;
 
-	int m_ItemCount;
-	Item* m_Items;
+	std::vector<Item*> m_items;
 
 	Player m_player;
 

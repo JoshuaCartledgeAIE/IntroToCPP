@@ -3,7 +3,7 @@ const char* const ESC = "\x1b";
 const char* const CSI = "\x1b[";
 
 // Screen Positions
-const char* const TITLE = "\x1b[1;20H";
+const char* const TITLE = "\x1b[1;35H";
 const char* const INDENT = "\x1b[5C";
 const char* const RESET_COLOR = "\x1b[0m";
 const char* const STATS_OUTPUT_POS = "\x1b[2;6H";
@@ -17,7 +17,7 @@ const char* const MAGENTA = "\x1b[38;5;164m";
 const char* const ORANGE = "\x1b[38;5;208m";
 const char* const RED = "\x1b[38;5;160m";
 const char* const DARK_RED = "\x1b[38;5;88m";
-const char* const BLUE = "\x1b[38;5;20m";
+const char* const BLUE = "\x1b[38;5;45m";
 const char* const WHITE = "\x1b[38;5;15m";
 const char* const GREEN = "\x1b[38;5;34m";
 const char* const GREY = "\x1b[38;5;243m";
@@ -73,3 +73,4 @@ const int PRIORITY_FOOD = 3;
 
 // Possible Enemy Attack Intents
 const enum EnemyAttack {WEAK, MED, STRONG, DEBUFF, STEAL, ESCAPE};
+const enum StatType {HP, MP, AT, DF};

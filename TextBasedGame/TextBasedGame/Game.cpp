@@ -10,6 +10,7 @@
 #include "Item.h"
 #include <vector>
 #include "BasicEnemy.h"
+#include "StatBooster.h"
 
 
 Game::Game() : m_gameOver{false}
@@ -18,8 +19,12 @@ Game::Game() : m_gameOver{false}
 
 Game::~Game()
 {
-	delete[] m_Items;
-	delete[] m_enemies;
+	for (auto iter = m_items.begin(); iter < m_items.end(); iter++) {
+		delete (*iter);
+	}
+	for (auto iter = m_enemies.begin(); iter < m_enemies.end(); iter++) {
+		delete (*iter);
+	}
 }
 
 bool Game::Startup()
@@ -67,7 +72,7 @@ void Game::Update()
 		return;
 	}
 
-	int command = 0;
+	int command = -1;
 	if (m_player.IsInCombat())
 		command = GetCombatCommand();
 	else
@@ -82,10 +87,10 @@ void Game::Update()
 	m_player.ExecuteCommand(command, &m_map[playerPos.y][playerPos.x], m_spellName, this);
 	
 	// If there are any dead enemies, remove them from their room
-	for (int i = 0; i < m_enemyCount; i++) {
-		if (m_enemies[i].IsAlive() == false) {
-			Point2D enemyPos = m_enemies[i].GetPosition();
-			m_map[enemyPos.y][enemyPos.x].RemoveGameObject(&m_enemies[i]);
+	for (int i = 0; i < m_enemies.size(); i++) {
+		if (m_enemies[i]->IsAlive() == false) {
+			Point2D enemyPos = m_enemies[i]->GetPosition();
+			m_map[enemyPos.y][enemyPos.x].RemoveGameObject(m_enemies[i]);
 		}
 	}
 
@@ -168,49 +173,37 @@ void Game::InitializeMap()
 void Game::InitializeEnemies()
 {
 	// Add a random number of enemies between 12 and 15
-	m_enemyCount = 12 + rand() % 4;
-	m_enemies = new BasicEnemy[m_enemyCount];
+	int enemyCount = 12 + rand() % 4;
 
-	for (int i = 0; i < m_enemyCount; i++) {
+	for (int i = 0; i < enemyCount; i++) {
 		// spawn enemies at random position (not near entrance)
 		int x = 2 + (rand() % (MAZE_WIDTH - 3));
 		int y = 2 + (rand() % (MAZE_HEIGHT - 3));
 
+		m_enemies.push_back(new BasicEnemy);
+
 		// Tell the enemy its position and tell the room it contains an enemy
-		m_enemies[i].SetPosition(Point2D{ x, y });
-		m_map[y][x].AddGameObject(&m_enemies[i]);
+		m_enemies[i]->SetPosition(Point2D{ x, y });
+		m_map[y][x].AddGameObject(m_enemies[i]);
 	}
 
 }
 
 void Game::InitializeItems()
 {
-	// create some Items
-	m_ItemCount = 7;
-	m_Items = new Item[m_ItemCount];
+	// create some items
+	int itemCount = 7;
+
 	// randomly place the food in the map
-	for (int i = 0; i < m_ItemCount; i++)
+	for (int i = 0; i < itemCount; i++)
 	{
-		String name = "";
 		int x = rand() % (MAZE_WIDTH - 1);
 		int y = rand() % (MAZE_HEIGHT - 1);
-		switch (rand() % 3) {
-		case 0:
-			name = "potion of ";
-			m_Items[i].SetHealthMultiplier(1.1f);
-			break;
-		case 1:
-			name = "sword of ";
-			m_Items[i].SetAttackMultiplier(1.1f);
-			break;
-		case 2:
-			name = "shield of ";
-			m_Items[i].SetDefenceMultiplier(1.1f);
-			break;
-		}
-		name.Append(itemNames[(rand() % 15)]);
-		m_Items[i].SetName(name);
-		m_map[y][x].AddGameObject(&m_Items[i]);
+		
+		
+		m_items.push_back(new StatBooster(rand() % 15 + 3, (StatType)(rand() % 4)));
+
+		m_map[y][x].AddGameObject(m_items[i]);
 	}	
 }
 
@@ -412,7 +405,7 @@ int Game::GetCommand()
 	std::cout << CSI << "7L";
 
 	std::cout << INDENT << "Enter a command: ";
-	int commandNo = 0;
+	int commandNo = -1;
 	// move cursor to position for player to enter input
 	std::cout << CSI << PLAYER_INPUT_Y << ";" << PLAYER_INPUT_X << "H" << YELLOW;
 	// clear the input buffer, ready for player input
@@ -480,7 +473,7 @@ int Game::GetCombatCommand()
 	std::cout << CSI << "7L";
 
 	std::cout << INDENT << "Enter a command: ";
-	int commandNo = 0;
+	int commandNo = -1;
 	// move cursor to position for player to enter input
 	std::cout << CSI << PLAYER_INPUT_Y << ";" << PLAYER_INPUT_X << "H" << YELLOW;
 	// clear the input buffer, ready for player input

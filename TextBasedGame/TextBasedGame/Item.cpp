@@ -3,19 +3,17 @@
 #include "String.h"
 #include "GameDefines.h"
 
-Item::Item() : m_healthMultiplier{1}, m_attackMultiplier{ 1 }, m_defenceMultiplier{ 1 }
+Item::Item()
 {
 	m_priority = PRIORITY_ITEM;
 	m_name[0] = 0;
 }
 
-Item::Item(String name, float health, float attack, float defence)
+Item::Item(String name, String desc)
 {
 	m_name = name;
+	m_name = desc;
 	m_priority = PRIORITY_ITEM;
-	m_healthMultiplier = health;
-	m_attackMultiplier = attack;
-	m_defenceMultiplier = defence;
 }
 
 Item::~Item()
@@ -34,6 +32,7 @@ void Item::Draw()
 
 void Item::DrawDescription()
 {
-	std::cout << INDENT << "There appears to be some treasure here. Perhaps you should investigate futher." << std::endl;
+	std::cout << INDENT << "There appears to be some " << YELLOW << 
+		"treasure" << RESET_COLOR << " here.Use the 'pickup' command to grab it!" << std::endl;
 }
 

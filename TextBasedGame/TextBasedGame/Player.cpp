@@ -15,21 +15,17 @@
 #include "LightningBolt.h"
 #include "Fireball.h"
 
-Player::Player() : Character{{0,0}, m_maxHP, BASE_AT, BASE_DF}, m_inCombat{false}
+Player::Player() : Character{{0,0}, m_maxHP, 15, 5}, m_inCombat{false}
 {
 	m_manaPoints = m_maxMP;
 	m_healthPoints = m_maxHP;
-	m_attackPoints = BASE_AT;
-	m_defendPoints = BASE_DF;
 	m_priority = PRIORITY_PLAYER;
 }
 
-Player::Player(Point2D position) : Character{ position, m_maxHP, BASE_AT, BASE_DF }, m_inCombat{ false }
+Player::Player(Point2D position) : Character{ position, m_maxHP, 15, 5 }, m_inCombat{ false }
 {
 	m_manaPoints = m_maxMP;
 	m_healthPoints = m_maxHP;
-	m_attackPoints = BASE_AT;
-	m_defendPoints = BASE_DF;
 	m_priority = PRIORITY_PLAYER;
 }
 
@@ -41,20 +37,14 @@ Player::~Player()
 	m_Items.clear();
 }
 
-void Player::AddItem(Item* pUp)
+void Player::AddItem(Item* item)
 {
+	// Have the item apply its buff
+	item->OnPickup(this);
+
 	// Add new Item to the array and sort it alphabetically
-	m_Items.push_back(pUp);
+	m_Items.push_back(item);
 	std::sort(m_Items.begin(), m_Items.end(), Item::Compare);
-
-	// Apply the stat buffs from the Item
-	float healthChange = m_maxHP * pUp->GetHealthMultiplier() - m_maxHP;
-	m_healthPoints += healthChange;
-	m_maxHP *= pUp->GetHealthMultiplier();
-
-	m_attackPoints *= pUp->GetAttackMultiplier();
-
-	m_defendPoints *= pUp->GetDefenceMultiplier();
 }
 
 void Player::Draw()
@@ -93,7 +83,8 @@ void Player::Draw()
 	std::cout << std::endl << std::endl << INDENT;
 	std::cout << YELLOW << "Inventory: " << RESET_COLOR << std::endl;
 	for (auto iter = m_Items.begin(); iter < m_Items.end(); iter++) {
-		std::cout << INDENT << INDENT << (*iter)->GetName() << std::endl;
+		std::cout << INDENT << INDENT <<
+			(*iter)->GetName() << ": " << (*iter)->GetDescription() << std::endl;
 	}
 }
 
@@ -158,10 +149,10 @@ void Player::ExecuteCommand(int command, Room* pRoom, String spellName, Game* ga
 		}
 		return;
 	case NORMAL_ATTACK:
-		Attack(pRoom->GetEnemy(), false);
+		Attack(pRoom->GetEnemy(), game, false);
 		break;
 	case RISKY_ATTACK:
-		Attack(pRoom->GetEnemy(), true);
+		Attack(pRoom->GetEnemy(), game, true);
 		break;
 	case PICKUP:
 		Pickup(pRoom);
@@ -191,7 +182,8 @@ void Player::Pickup(Room* pRoom)
 		Item* Item = pRoom->GetItem();
 
 		// Tell user what Item was picked up
-		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You picked up the " << Item->GetName() << std::endl;
+		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You picked up the " << 
+			YELLOW << Item->GetName() << RESET_COLOR << "." << std::endl;
 
 		// add Item to inventory
 		AddItem(Item);
@@ -204,7 +196,7 @@ void Player::Pickup(Room* pRoom)
 	}
 }
 
-void Player::Attack(Enemy* pEnemy, bool isRisky)
+void Player::Attack(Enemy* pEnemy, Game* game, bool isRisky)
 {
 
 	if (pEnemy == nullptr) {
@@ -241,7 +233,7 @@ void Player::Attack(Enemy* pEnemy, bool isRisky)
 
 		// If enemy dies, tell the player
 		if (pEnemy->IsAlive() == false) {
-			std::cout << INDENT << GREEN << "You have killed the enemy!" << RESET_COLOR << std::endl;
+			pEnemy->OnDeath(game);
 		}
 		else {
 			// Otherwise the enemy does their chosen attack intent
@@ -256,44 +248,67 @@ void Player::Attack(Enemy* pEnemy, bool isRisky)
 
 void Player::CastSpell(String spellName, Game* game)
 {
-	// Search for spell in spellbook (Replace with binary search later???)
-	for (Spell* spell : m_spells) {
-		if (spellName == spell->GetName().ToLower()) {
-			// Spell exists, therefore attempt to cast it
-			// Check if spell is for the current state (combat or utility)
-			if (spell->IsForCombat() != m_inCombat) {
-				std::cout << EXTRA_OUTPUT_POS << RED <<
-					"Now is not the time to use that spell!" << RESET_COLOR << std::endl;
-				return;
-			}
-			// Check if player has enough mana first
-			if (m_manaPoints < spell->GetCost()) {
-				// Spell failed to cast (not enough mana)
-				std::cout << EXTRA_OUTPUT_POS << RED <<
-					"You dont have enough MP to cast that spell!" << RESET_COLOR << std::endl;
-				return;
-			}
-			// Cast the spell and spend the mana
-			spell->Cast(game, this);
-			m_manaPoints -= spell->GetCost();
+	// Binary Search for spellName in spellbook
+	int leftBound = 0;
+	int rightBound = m_spells.size() - 1;
+	Spell* spell = nullptr;
+	
+	while (leftBound <= rightBound) {
+		// set mid index to be in the middle of the left and right bounds
+		int mid = (int)((leftBound + rightBound) / 2);
 
-			// If spell was cast in combat, enemy now fights back
-			if (m_inCombat) {
-				game->GetRoom(m_mapPosition).GetEnemy()->Attack(this);
-			}
+		// check if the middle spell name is the one we are looking for
+		if (spellName == m_spells[mid]->GetName().ToLower()) {
+			spell = m_spells[mid];
+			break;
+		}
 
-			// Redraw game and player to update any changes that the spells made
-			game->Draw();
-			Draw(); // to update the player position and mana points
+		// adjust left/right bounds based on if spellName comes before or after current middle value
+		if (spellName > m_spells[mid]->GetName().ToLower()) {
+			leftBound = mid + 1;
+		}
 
-			std::cout << std::endl;
-			return;
+		if (spellName < m_spells[mid]->GetName().ToLower()) {
+			rightBound = mid - 1;
 		}
 	}
 
-	// If program reaches here, the spell was not found in the player's known spells
-	std::cout << EXTRA_OUTPUT_POS << RED << 
-		"You don't know how to cast '" << spellName << "'."  << RESET_COLOR << std::endl;
+	// check if spell was not found in spellbook
+	if (spell == nullptr) { 
+		std::cout << EXTRA_OUTPUT_POS << RED <<
+			"You don't know how to cast '" << spellName << "'." << RESET_COLOR << std::endl;
+		return; 
+	}
+
+	// If program reaches here, the spell exists, therefore attempt to cast it
+	// Check if spell is for the current state (combat or utility)
+	if (spell->IsForCombat() != m_inCombat) {
+		std::cout << EXTRA_OUTPUT_POS << RED <<
+			"Now is not the time to use that spell!" << RESET_COLOR << std::endl;
+		return;
+	}
+	// Check if player has enough mana first
+	if (m_manaPoints < spell->GetCost()) {
+		// Spell failed to cast (not enough mana)
+		std::cout << EXTRA_OUTPUT_POS << RED <<
+			"You dont have enough MP to cast that spell!" << RESET_COLOR << std::endl;
+		return;
+	}
+	// Cast the spell and spend the mana
+	spell->Cast(game, this);
+	m_manaPoints -= spell->GetCost();
+
+	// If spell was cast in combat, enemy then fights back
+	if (m_inCombat) {
+		game->GetRoom(m_mapPosition).GetEnemy()->Attack(this);
+	}
+
+	// Redraw game and player to update any changes that the spells made
+	game->Draw();
+	Draw(); // to update the player position and mana points
+
+	std::cout << std::endl;
+	return;
 }
 
 

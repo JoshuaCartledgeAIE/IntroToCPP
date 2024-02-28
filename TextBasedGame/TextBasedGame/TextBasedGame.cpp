@@ -15,6 +15,8 @@ int main() {
 	Game game;
 
 	if (game.Startup() == false) return 1;
+
+	std::cout << TITLE << YELLOW << "MYSTICAL MURDER MAZE" << RESET_COLOR;
 	
 	while (!game.IsGameOver()) {
 		// Main game loop

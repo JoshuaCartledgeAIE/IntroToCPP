@@ -25,6 +25,6 @@ void Fireball::Cast(Game* game, Player* pPlayer)
 		std::cout << "The enemy has " << enemy->GetHP() << " health remaining." << std::endl;
 	}
 	else {
-		std::cout << GREEN << "You killed the enemy!" << RESET_COLOR << std::endl;
+		enemy->OnDeath(game);
 	}
 }
