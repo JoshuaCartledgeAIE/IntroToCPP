@@ -1,5 +1,7 @@
 #include "Enemy.h"
-
+#include "Character.h"
+#include "Game.h"
+#include <iostream>
 
 Enemy::Enemy() : Character{ {0,0}, 40, 15, 5 }, m_nextAttack{ ESCAPE }, m_seqIndex{ 0 }, m_itemDropChance{0}
 {
