@@ -93,14 +93,14 @@ void Enemy::OnDeath(Game* game)
 	// Either drop an item or some MP
 	if ((rand() % 100) / 100.0f < m_itemDropChance) {
 		std::cout << YELLOW << "The enemy dropped an item! (use the 'pickup' command to grab it!)" << RESET_COLOR << std::endl;
+		game->AddStatItem(m_mapPosition);
 	}
 	else {
 		Player* player = game->GetPlayer();
 
 		// Increase players MP by random amount (capping it at max MP)
-		int MPGain = rand() % 5 + 1;
+		int MPGain = rand() % 5 + 3;
 		player->SetMP(player->GetMP() + MPGain);
-		if (player->GetMP() > player->GetMaxMP()) { player->SetMP(player->GetMaxMP()); }
 		std::cout << "You gained " << BLUE << MPGain << "MP!" << RESET_COLOR;
 	}
 	std::cout << std::endl;

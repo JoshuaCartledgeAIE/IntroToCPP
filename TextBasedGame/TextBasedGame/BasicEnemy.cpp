@@ -1,7 +1,7 @@
 #include "BasicEnemy.h"
 #include <iostream>
 
-BasicEnemy::BasicEnemy() : Enemy{{0,0}, 40, 15, 5, String(""), 0}
+BasicEnemy::BasicEnemy() : Enemy{{0,0}, 40, 15, 5, String(""), 50}
 {
 	// Pick a random name for this enemy
 	String names[] = { "Bat", "Slime", "Skeleton" };

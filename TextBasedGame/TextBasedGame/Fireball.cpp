@@ -20,9 +20,10 @@ void Fireball::Cast(Game* game, Player* pPlayer)
 	// Print result of attack
 	std::cout << EXTRA_OUTPUT_POS << RESET_COLOR <<
 		"You send a massive fireball hurling at the enemy and it takes " <<
-		RED << damage << " damage." << RESET_COLOR << std::endl << INDENT;
+		RED << damage << " damage." << RESET_COLOR << std::endl ;
 	if (enemy->IsAlive()) {
-		std::cout << "The enemy has " << enemy->GetHP() << " health remaining." << std::endl;
+		std::cout << INDENT << "The enemy has " << enemy->GetHP() 
+			<< " health remaining." << std::endl;
 	}
 	else {
 		enemy->OnDeath(game);

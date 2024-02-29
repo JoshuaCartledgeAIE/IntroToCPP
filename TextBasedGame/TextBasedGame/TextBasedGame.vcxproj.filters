@@ -84,6 +84,9 @@
     <ClCompile Include="StatBooster.cpp">
       <Filter>Source Files\Items</Filter>
     </ClCompile>
+    <ClCompile Include="Spellbook.cpp">
+      <Filter>Source Files\Items</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Character.h">
@@ -138,6 +141,9 @@
       <Filter>Header Files\Spells</Filter>
     </ClInclude>
     <ClInclude Include="StatBooster.h">
+      <Filter>Header Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="Spellbook.h">
       <Filter>Header Files\Items</Filter>
     </ClInclude>
   </ItemGroup>

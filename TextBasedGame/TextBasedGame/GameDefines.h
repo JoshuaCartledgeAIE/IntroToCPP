@@ -1,26 +1,27 @@
 #pragma once
-const char* const ESC = "\x1b";
-const char* const CSI = "\x1b[";
+
+const char * const ESC = "\x1b";
+const char * const CSI = "\x1b[";
 
 // Screen Positions
-const char* const TITLE = "\x1b[1;35H";
-const char* const INDENT = "\x1b[5C";
-const char* const RESET_COLOR = "\x1b[0m";
-const char* const STATS_OUTPUT_POS = "\x1b[2;6H";
-const char* const MAP_OUTPUT_POS = "\x1b[3;6H";
-const char* const EXTRA_OUTPUT_POS = "\x1b[23;6H";
-const char* const INVENTORY_OUTPUT_POS = "\x1b[31;6H";
+const char * const TITLE = "\x1b[1;35H";
+const char * const INDENT = "\x1b[5C";
+const char * const RESET_COLOR = "\x1b[0m";
+const char * const STATS_OUTPUT_POS = "\x1b[2;6H";
+const char * const MAP_OUTPUT_POS = "\x1b[3;6H";
+const char * const EXTRA_OUTPUT_POS = "\x1b[23;6H";
+const char * const INVENTORY_OUTPUT_POS = "\x1b[31;6H";
 
 // Colors
-const char* const YELLOW = "\x1b[38;5;228m";
-const char* const MAGENTA = "\x1b[38;5;164m";
-const char* const ORANGE = "\x1b[38;5;208m";
-const char* const RED = "\x1b[38;5;160m";
-const char* const DARK_RED = "\x1b[38;5;88m";
-const char* const BLUE = "\x1b[38;5;45m";
-const char* const WHITE = "\x1b[38;5;15m";
-const char* const GREEN = "\x1b[38;5;34m";
-const char* const GREY = "\x1b[38;5;243m";
+const char * const YELLOW = "\x1b[38;5;228m";
+const char * const MAGENTA = "\x1b[38;5;164m";
+const char * const ORANGE = "\x1b[38;5;208m";
+const char * const RED = "\x1b[38;5;160m";
+const char * const DARK_RED = "\x1b[38;5;88m";
+const char * const BLUE = "\x1b[38;5;45m";
+const char * const WHITE = "\x1b[38;5;15m";
+const char * const GREEN = "\x1b[38;5;34m";
+const char * const GREY = "\x1b[38;5;243m";
 
 // room types
 const int EMPTY = 0;
@@ -54,23 +55,20 @@ const int CAST = 12;
 const int QUIT = 13;
 const int COMBAT_FAIL = 14;
 
-const int VISION_RANGE = 1;
-
-// Adjectives for item names
-static const char itemNames[15][30] = {
-"bravery", "courage", "invulnerability", "incontinence",
-"improbability", "impatience", "indecision", "inspiration",
-"independence", "incurability", "integration", "invocation",
-"inferno", "indigestion", "inoculation"
-};
+const int VISION_RANGE = 30;
 
 // Priority Values
 const int PRIORITY_DEFAULT = 5;
 const int PRIORITY_PLAYER = 0;
 const int PRIORITY_ENEMY = 1;
 const int PRIORITY_ITEM = 2;
-const int PRIORITY_FOOD = 3;
+
 
 // Possible Enemy Attack Intents
 const enum EnemyAttack {WEAK, MED, STRONG, DEBUFF, STEAL, ESCAPE};
+
+// Different stat types (for stat booster item)
 const enum StatType {HP, MP, AT, DF};
+
+// Different Enemy types
+const enum EnemyType {BASIC, THIEF, SUPPORT, ELITE};

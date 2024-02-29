@@ -140,6 +140,7 @@
     <ClCompile Include="Room.cpp" />
     <ClCompile Include="Shift.cpp" />
     <ClCompile Include="Spell.cpp" />
+    <ClCompile Include="Spellbook.cpp" />
     <ClCompile Include="StatBooster.cpp" />
     <ClCompile Include="String.cpp" />
     <ClCompile Include="Teleport.cpp" />
@@ -161,6 +162,7 @@
     <ClInclude Include="Room.h" />
     <ClInclude Include="Shift.h" />
     <ClInclude Include="Spell.h" />
+    <ClInclude Include="Spellbook.h" />
     <ClInclude Include="StatBooster.h" />
     <ClInclude Include="String.h" />
     <ClInclude Include="Teleport.h" />

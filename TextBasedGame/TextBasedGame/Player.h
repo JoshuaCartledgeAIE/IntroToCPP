@@ -29,12 +29,14 @@ public:
 	float GetMP() { return m_manaPoints; }
 	float GetMaxMP() { return m_maxMP; }
 
-	void SetMaxMP(int value) { m_maxMP = value;}
-	void SetMaxHP(int value) { m_maxHP = value;}
-	void SetMP(int value) { m_manaPoints = value;}
-	void SetHP(int value) { m_healthPoints = value; }
-	void SetAT(int value) { m_attackPoints = value; }
-	void SetDF(int value) { m_defendPoints = value; }
+	// Setters involving values with maximums should ensure that they stay under those maximums
+	void SetMaxMP(float value) { m_maxMP = value; if (m_manaPoints > m_maxMP) m_manaPoints = m_maxMP;}
+	void SetMaxHP(float value) { m_maxHP = value; if (m_healthPoints > m_maxHP) m_healthPoints = m_maxHP;}
+	void SetMP(float value) { m_manaPoints = value; if (m_manaPoints > m_maxMP) m_manaPoints = m_maxMP; }
+	void SetHP(float value) { m_healthPoints = value; if (m_healthPoints > m_maxHP) m_healthPoints = m_maxHP; }
+	
+	void SetAT(float value) { m_attackPoints = value; }
+	void SetDF(float value) { m_defendPoints = value; }
 
 	bool IsInCombat() { return m_inCombat; }
 	void SetCombatState(bool combat) { m_inCombat = combat; }

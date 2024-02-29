@@ -42,7 +42,10 @@ void Player::AddItem(Item* item)
 	// Have the item apply its buff
 	item->OnPickup(this);
 
-	// Add new Item to the array and sort it alphabetically
+	// Don't add spellbooks to the player's inventory
+	if (item->GetName() == "Spellbook") { return; }
+
+	// Add new Item to the inventory array and sort it alphabetically
 	m_Items.push_back(item);
 	std::sort(m_Items.begin(), m_Items.end(), Item::Compare);
 }
@@ -50,7 +53,8 @@ void Player::AddItem(Item* item)
 void Player::Draw()
 {
 	// Draw stats at top of screen
-	std::cout << STATS_OUTPUT_POS << "HP: " << (int)m_healthPoints << "/" << (int)m_maxHP 
+	std::cout << STATS_OUTPUT_POS << CSI << "1M" << CSI << "1L";
+	std::cout << STATS_OUTPUT_POS << "HP: " << (int)m_healthPoints << "/" << (int)m_maxHP
 		<< "    MP: " << (int)m_manaPoints << "/" << (int)m_maxMP
 		<< "    Attack: " << (int)m_attackPoints << "     Defense: " << (int)m_defendPoints;
 
@@ -61,7 +65,7 @@ void Player::Draw()
 	std::cout << MAGENTA << "\x81" << RESET_COLOR;
 
 	
-	std::cout << INVENTORY_OUTPUT_POS << CSI << "15M";
+	std::cout << INVENTORY_OUTPUT_POS << CSI << "35M";
 
 	// Draw spellbook
 	std::cout << INVENTORY_OUTPUT_POS << YELLOW;
@@ -74,8 +78,9 @@ void Player::Draw()
 	for (auto iter = m_spells.begin(); iter < m_spells.end(); iter++) {
 		// display utility or combat spells based on whether player is in combat
 		if ((*iter)->IsForCombat() == m_inCombat) { 
-			std::cout << INDENT << INDENT <<
-				(*iter)->GetName() << ": " << (*iter)->GetDescription() << std::endl;
+			std::cout << INDENT << INDENT << MAGENTA << 
+				(*iter)->GetName() << RESET_COLOR << ": " << 
+				(*iter)->GetDescription() << std::endl;
 		}
 	}
 
@@ -127,8 +132,10 @@ void Player::ExecuteCommand(int command, Room* pRoom, String spellName, Game* ga
 {
 	std::vector<int> transitions = pRoom->GetTransitions();
 
+	// Do the appropriate action based on the command that the user inputted
 	switch (command) {
 	case EAST:
+		// Before moving, check if room's transitions will allow it
 		if (m_mapPosition.x < MAZE_WIDTH - 1 && std::find(transitions.begin(), transitions.end(), command) != transitions.end()) {
 			m_mapPosition.x++;
 		}
@@ -169,6 +176,7 @@ void Player::ExecuteCommand(int command, Room* pRoom, String spellName, Game* ga
 		break;
 	}
 
+	// After command has resolved, wait for user input so they can read what happened
 	std::cout << INDENT << "Press 'Enter' to continue.";
 	std::cin.clear();
 	std::cin.ignore(std::cin.rdbuf()->in_avail());
@@ -182,8 +190,8 @@ void Player::Pickup(Room* pRoom)
 		Item* Item = pRoom->GetItem();
 
 		// Tell user what Item was picked up
-		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You picked up the " << 
-			YELLOW << Item->GetName() << RESET_COLOR << "." << std::endl;
+		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "You picked up a " << 
+			YELLOW << Item->GetName() << RESET_COLOR << "!" << std::endl;
 
 		// add Item to inventory
 		AddItem(Item);

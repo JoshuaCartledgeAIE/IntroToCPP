@@ -11,6 +11,7 @@
 #include <vector>
 #include "BasicEnemy.h"
 #include "StatBooster.h"
+#include "Spellbook.h"
 
 
 Game::Game() : m_gameOver{false}
@@ -47,10 +48,6 @@ bool Game::Startup()
 	m_player.SetPosition(Point2D{ 0,0 });
 	// Have player learn first spell
 	m_player.LearnSpell(String("Shift"));
-	m_player.LearnSpell(String("Teleport"));
-	m_player.LearnSpell(String("Earthquake"));
-	m_player.LearnSpell(String("Lightning Bolt"));
-	m_player.LearnSpell(String("Fireball"));
 
 	return true;
 }
@@ -129,6 +126,53 @@ bool Game::IsGameOver()
 	return m_gameOver;
 }
 
+void Game::AddStatItem(Point2D pos)
+{
+	StatType type = (StatType)(rand() % 4);
+
+	switch (type)
+	{
+	case HP:
+		m_items.push_back(new StatBooster(rand() % 9 + 10, type));
+		break;
+	case MP:
+		m_items.push_back(new StatBooster(rand() % 9 + 8, type));
+		break;
+	case AT:
+		m_items.push_back(new StatBooster(rand() % 6 + 3, type));
+		break;
+	case DF:
+		m_items.push_back(new StatBooster(rand() % 6 + 2, type));
+		break;
+	default:
+		break;
+	}
+
+	m_map[pos.y][pos.x].AddGameObject(m_items[m_items.size()-1]);
+}
+
+void Game::AddEnemy(Point2D pos, EnemyType type)
+{
+	switch (type)
+	{
+	case BASIC:
+		m_enemies.push_back(new BasicEnemy);
+		break;
+	case THIEF:
+		break;
+	case SUPPORT:
+		break;
+	case ELITE:
+		break;
+	default:
+		break;
+	}
+
+	// Tell the enemy its position and tell the room it contains an enemy
+	m_enemies[m_enemies.size()-1]->SetPosition(pos);
+	m_map[pos.y][pos.x].AddGameObject(m_enemies[m_enemies.size() - 1]);
+}
+
 bool Game::EnableVirtualTerminal()
 {
 	// Set output mode to handle virtual terminal sequences
@@ -172,39 +216,57 @@ void Game::InitializeMap()
 
 void Game::InitializeEnemies()
 {
-	// Add a random number of enemies between 12 and 15
-	int enemyCount = 12 + rand() % 4;
+	// Add a random number of enemies
+	int enemyCount = 40;
 
 	for (int i = 0; i < enemyCount; i++) {
-		// spawn enemies at random position (not near entrance)
-		int x = 2 + (rand() % (MAZE_WIDTH - 3));
-		int y = 2 + (rand() % (MAZE_HEIGHT - 3));
 
-		m_enemies.push_back(new BasicEnemy);
+		int x = 0;
+		int y = 0;
+		// find random unoccupied space
+		do {
+			x = rand() % (MAZE_WIDTH - 1) + 1;
+			y = rand() % (MAZE_HEIGHT - 1) + 1;
+		} while (m_map[y][x].GetEnemy() != nullptr || m_map[y][x].GetItem() != nullptr);
 
-		// Tell the enemy its position and tell the room it contains an enemy
-		m_enemies[i]->SetPosition(Point2D{ x, y });
-		m_map[y][x].AddGameObject(m_enemies[i]);
+		// Add enemy to room
+		AddEnemy({ x,y }, BASIC);
 	}
-
 }
 
 void Game::InitializeItems()
 {
-	// create some items
-	int itemCount = 7;
+	//// add a fixed number of stat booster items
+	//int itemCount = 10;
 
-	// randomly place the food in the map
-	for (int i = 0; i < itemCount; i++)
-	{
-		int x = rand() % (MAZE_WIDTH - 1);
-		int y = rand() % (MAZE_HEIGHT - 1);
-		
-		
-		m_items.push_back(new StatBooster(rand() % 15 + 3, (StatType)(rand() % 4)));
+	//// randomly place the items in the map
+	//for (int i = 0; i < itemCount; i++)
+	//{
+	//	int x = rand() % (MAZE_WIDTH - 2) + 1;
+	//	int y = rand() % (MAZE_HEIGHT - 2) + 1;
 
-		m_map[y][x].AddGameObject(m_items[i]);
-	}	
+	//	// dont add item to rooms with an enemy or another item
+	//	if (m_map[y][x].GetEnemy() == nullptr && m_map[y][x].GetItem() == nullptr)
+	//		AddStatItem({ x,y });
+	//}
+
+	// add a spellbook for every spell
+	String spellNames[] = { "Earthquake", "Fireball", "Lightning Bolt", "Teleport" };
+	for (String spell : spellNames) {
+
+		int x = 0;
+		int y = 0;
+		// find random unoccupied space
+		do {
+			x = rand() % (MAZE_WIDTH - 2) + 1;
+			y = rand() % (MAZE_HEIGHT - 2) + 1;
+		} while (m_map[y][x].GetEnemy() != nullptr || m_map[y][x].GetItem() != nullptr);
+		
+		// add the spellbook to the items array and to the room
+		m_items.push_back(new Spellbook(spell));
+		m_map[y][x].AddGameObject(m_items[m_items.size() - 1]);
+	}
+
 }
 
 void Game::GenerateTransitions()
@@ -253,7 +315,12 @@ void Game::DrawMap()
 
 void Game::DrawMapBorders() {
 	// set border color based on current combat state
-	String borderColor = m_player.IsInCombat() ? RED : YELLOW;
+	String borderColor = GREY;
+	if (m_player.IsInCombat())
+		borderColor = RED;
+	else if (m_map[m_player.GetPosition().y][m_player.GetPosition().x].GetItem() != nullptr)
+		borderColor = YELLOW;
+
 
 	// Draw top map border
 	std::cout << borderColor << MAP_OUTPUT_POS << "\xC9";
@@ -340,7 +407,7 @@ void Game::DrawCommands()
 			<<  "w / a / s / d"  << RESET_COLOR << ": Moves player in the specified direction on the map" << std::endl;
 		std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
 
-		std::cout << MAGENTA << "pickup" << RESET_COLOR << ": Moves player in the specified direction on the map" << std::endl;
+		std::cout << MAGENTA << "pickup" << RESET_COLOR << ": Picks up an item (if there is one) in the current room" << std::endl;
 		std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
 
 		std::cout << MAGENTA << "cast spellName" << RESET_COLOR << ": casts the named spell (see known spells below)" << std::endl;
