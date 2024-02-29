@@ -14,7 +14,7 @@ public:
 
 
 	int OnAttacked(int damageDealt);
-	int Attack(Player* pPlayer);
+	int Attack(Player* pPlayer, Game* game);
 
 	void OnDeath(Game* game);
 

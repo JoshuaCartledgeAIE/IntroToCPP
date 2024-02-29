@@ -10,7 +10,7 @@ public:
 	StatBooster(int amount, StatType type);
 
 	void OnPickup(Player* pPlayer) override;
-
+	void OnStolen(Player* pPlayer) override;
 
 private:
 	int m_statBoostAmount;

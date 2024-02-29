@@ -49,9 +49,9 @@ private:
 	bool m_gameOver;
 
 	Room m_map[MAZE_HEIGHT][MAZE_WIDTH];
-
+	
+	// the Game class stores pointers to all enemies and items, and deletes them at the end
 	std::vector<Enemy*> m_enemies;
-
 	std::vector<Item*> m_items;
 
 	Player m_player;

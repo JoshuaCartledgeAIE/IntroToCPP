@@ -146,6 +146,7 @@
     <ClCompile Include="String.cpp" />
     <ClCompile Include="Teleport.cpp" />
     <ClCompile Include="TextBasedGame.cpp" />
+    <ClCompile Include="ThiefEnemy.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SimpleItems.h" />
@@ -168,6 +169,7 @@
     <ClInclude Include="StatBooster.h" />
     <ClInclude Include="String.h" />
     <ClInclude Include="Teleport.h" />
+    <ClInclude Include="ThiefEnemy.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

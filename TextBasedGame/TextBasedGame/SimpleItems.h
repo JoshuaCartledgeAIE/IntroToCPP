@@ -8,6 +8,7 @@ public:
 	SpellcastingGuidebook();
 
 	void OnPickup(Player* pPlayer) override;
+	void OnStolen(Player* pPlayer) override;
 };
 
 class Torch : public Item 
@@ -16,6 +17,7 @@ public:
 	Torch();
 
 	void OnPickup(Player* pPlayer) override;
+	void OnStolen(Player* pPlayer) override;
 };
 
 class LuckyClover : public Item
@@ -24,6 +26,7 @@ public:
 	LuckyClover();
 
 	void OnPickup(Player* pPlayer) override;
+	void OnStolen(Player* pPlayer) override;
 };
 
 class HarvestersScythe : public Item
@@ -32,5 +35,6 @@ public:
 	HarvestersScythe();
 
 	void OnPickup(Player* pPlayer) override;
+	void OnStolen(Player* pPlayer) override;
 };
 

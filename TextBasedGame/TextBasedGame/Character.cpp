@@ -11,3 +11,9 @@ Character::Character(Point2D pos, float HP, float AT, float DF) :GameObject{ pos
 m_healthPoints{ HP }, m_attackPoints{ AT }, m_defendPoints{ DF }
 {
 }
+
+void Character::AddItem(Item* item)
+{
+	m_inventory.push_back(item);
+	std::sort(m_inventory.begin(), m_inventory.end(), Item::Compare);
+}

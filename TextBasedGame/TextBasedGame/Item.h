@@ -22,6 +22,7 @@ public:
 	String GetDescription() { return m_description; }
 
 	virtual void OnPickup(Player* pPlayer) = 0;
+	virtual void OnStolen(Player* pPlayer) = 0;
 
 protected:
 	String m_name;

@@ -20,11 +20,13 @@ public:
 	
 	bool IsAlive() { return m_healthPoints > 0; }
 
-	void AddItem(Item* pUp);
+	virtual void AddItem(Item* item);
+
+public:
+	std::vector<Item*> m_inventory;
 
 protected:
-
-
+	
 	float m_healthPoints;
 	float m_attackPoints;
 	float m_defendPoints;

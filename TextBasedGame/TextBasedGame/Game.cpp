@@ -10,6 +10,7 @@
 #include "Item.h"
 #include <vector>
 #include "BasicEnemy.h"
+#include "ThiefEnemy.h"
 #include "StatBooster.h"
 #include "Spellbook.h"
 #include "SimpleItems.h"
@@ -162,6 +163,7 @@ void Game::AddEnemy(Point2D pos, EnemyType type)
 		m_enemies.push_back(new BasicEnemy);
 		break;
 	case THIEF:
+		m_enemies.push_back(new ThiefEnemy);
 		break;
 	case SUPPORT:
 		break;
@@ -224,7 +226,7 @@ void Game::InitializeEnemies()
 
 	for (int i = 0; i < enemyCount; i++) {
 		// Add enemy to random unoccupied room
-		AddEnemy(GetRandomEmptyPos(), BASIC);
+		AddEnemy(GetRandomEmptyPos(), THIEF);
 	}
 }
 
@@ -400,7 +402,7 @@ void Game::DrawLegend()
 	std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
 	std::cout << "\xFE = Exit" << std::endl;
 	std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
-	
+
 }
 
 void Game::DrawCommands()

@@ -24,12 +24,13 @@ int Enemy::OnAttacked(int damageDealt)
 	return damage;
 }
 
-int Enemy::Attack(Player* pPlayer)
+int Enemy::Attack(Player* pPlayer, Game* game)
 {
 	// Make sure a dead enemy doesn't attack!
 	if (!IsAlive()) { return -1; }
 
 	int damage = 0;
+	int index = 0;
 	// Act on attack intent
 	switch (m_nextAttack)
 	{
@@ -63,9 +64,24 @@ int Enemy::Attack(Player* pPlayer)
 		damage = -1;
 		break;
 	case STEAL:
+		// pick a random item from player's inventory
+		if (pPlayer->m_inventory.size() == 0) { std::cout << INDENT << "The enemy stole nothing!" << std::endl; break; }
+		index = rand() % pPlayer->m_inventory.size();
+		// notify player of what item was stolen
+		std::cout << INDENT << "The enemy stole your " << YELLOW 
+			<< pPlayer->m_inventory[index]->GetName() << RESET_COLOR << " from you!" << std::endl;
+		// Add it to enemy's inventory
+		m_inventory.push_back(pPlayer->m_inventory[index]);
+		// Make player lose the benefit of the item
+		pPlayer->m_inventory[index]->OnStolen(pPlayer);
+		// Remove it from player's inventory
+		pPlayer->m_inventory.erase(pPlayer->m_inventory.begin() + index);
 		damage = -1;
 		break;
 	case ESCAPE:
+		// Remove this enemy from its room
+		game->GetRoom(m_mapPosition).RemoveGameObject(this);
+		std::cout << INDENT << "The enemy ran away, taking all its stolen items with it!" << std::endl;
 		damage = -1;
 		break;
 	default:
@@ -106,6 +122,13 @@ void Enemy::OnDeath(Game* game)
 		game->GetPlayer()->SetHP(game->GetPlayer()->GetHP() + HPGain);
 		std::cout << INDENT << GREEN << "You gained " << HPGain <<
 			"HP from the Harvester's Scythe!" << RESET_COLOR << std::endl;
+	}
+
+	// Return any stolen items
+	std::cout << INDENT << "Your stolen items are now returned to you:" << std::endl;
+	for (Item* item : m_inventory) {
+		game->GetPlayer()->m_inventory.push_back(item);
+		item->OnPickup(game->GetPlayer());
 	}
 }
 

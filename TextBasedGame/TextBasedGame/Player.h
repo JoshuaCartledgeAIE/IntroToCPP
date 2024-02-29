@@ -17,7 +17,7 @@ public:
 	Player(Point2D position);
 	~Player();
 
-	void AddItem(Item* pUp);
+	void AddItem(Item* item) override;
 
 	void SetPosition(const Point2D& position) { m_mapPosition = position;}
 	Point2D GetPosition() { return m_mapPosition; };
@@ -61,7 +61,6 @@ private:
 	void CastSpell(String spellName, Game* game);
 
 private:
-	std::vector<Item*> m_inventory;
 
 	float m_manaPoints;
 

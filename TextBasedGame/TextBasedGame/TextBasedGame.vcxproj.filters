@@ -90,6 +90,9 @@
     <ClCompile Include="SimpleItems.cpp">
       <Filter>Source Files\Items</Filter>
     </ClCompile>
+    <ClCompile Include="ThiefEnemy.cpp">
+      <Filter>Source Files\Enemies</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Character.h">
@@ -151,6 +154,9 @@
     </ClInclude>
     <ClInclude Include="SimpleItems.h">
       <Filter>Header Files\Items</Filter>
+    </ClInclude>
+    <ClInclude Include="ThiefEnemy.h">
+      <Filter>Header Files\Enemies</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -13,6 +13,11 @@ void SpellcastingGuidebook::OnPickup(Player* pPlayer)
 	pPlayer->m_spellCostMultiplier = 0.75f;
 }
 
+void SpellcastingGuidebook::OnStolen(Player* pPlayer)
+{
+	pPlayer->m_spellCostMultiplier = 1.0f;
+}
+
 Torch::Torch()
 {
 	m_name = String("Torch");
@@ -23,6 +28,11 @@ void Torch::OnPickup(Player* pPlayer)
 {
 	std::cout << INDENT << "Your vision range now extends to 2 rooms away!" << std::endl;
 	pPlayer->m_visionRange = 2;
+}
+
+void Torch::OnStolen(Player* pPlayer)
+{
+	pPlayer->m_visionRange = 1;
 }
 
 LuckyClover::LuckyClover()
@@ -37,6 +47,11 @@ void LuckyClover::OnPickup(Player* pPlayer)
 	pPlayer->m_riskyHitChance = 0.75f;
 }
 
+void LuckyClover::OnStolen(Player* pPlayer)
+{
+	pPlayer->m_riskyHitChance = 0.5f;
+}
+
 HarvestersScythe::HarvestersScythe()
 {
 	m_name = String("Harvester's Scythe");
@@ -47,4 +62,9 @@ void HarvestersScythe::OnPickup(Player* pPlayer)
 {
 	std::cout << INDENT << "You now gain a small amount of HP each time you kill an enemy!" << std::endl;
 	pPlayer->m_gainHPOnKill = true;
+}
+
+void HarvestersScythe::OnStolen(Player* pPlayer)
+{
+	pPlayer->m_gainHPOnKill = false;
 }

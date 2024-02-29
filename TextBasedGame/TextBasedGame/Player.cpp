@@ -253,7 +253,7 @@ void Player::Attack(Enemy* pEnemy, Game* game, bool isRisky)
 		}
 		else {
 			// Otherwise the enemy does their chosen attack intent
-			int damageTaken = pEnemy->Attack(this);
+			int damageTaken = pEnemy->Attack(this, game);
 			if (damageTaken != -1){
 				// if the attack involves taking damage, take the damage
 				m_healthPoints -= damageTaken;
@@ -316,7 +316,7 @@ void Player::CastSpell(String spellName, Game* game)
 
 	// If spell was cast in combat, enemy then fights back
 	if (m_inCombat) {
-		game->GetRoom(m_mapPosition).GetEnemy()->Attack(this);
+		game->GetRoom(m_mapPosition).GetEnemy()->Attack(this, game);
 	}
 
 	// Redraw game and player to update any changes that the spells made

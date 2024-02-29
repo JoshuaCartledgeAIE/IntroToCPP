@@ -10,6 +10,7 @@ public:
 	Spellbook(String spell);
 
 	void OnPickup(Player* pPlayer) override;
+	void OnStolen(Player* pPlayer) override {  }
 
 private:
 	String m_spellToLearn;

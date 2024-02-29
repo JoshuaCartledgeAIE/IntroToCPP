@@ -90,3 +90,31 @@ void StatBooster::OnPickup(Player* pPlayer)
 
 	pPlayer->Draw();
 }
+
+void StatBooster::OnStolen(Player* pPlayer)
+{
+	// Opposite effect of picking up the item
+	switch (m_statBoostType) // lower stat of the appropriate type
+	{
+	case HP:
+		// when lower max HP or MP, also lose the same amount of HP or MP
+		pPlayer->SetHP(pPlayer->GetHP() - m_statBoostAmount);
+		pPlayer->SetMaxHP(pPlayer->GetMaxHP() - m_statBoostAmount);
+		break;
+	case MP:
+		pPlayer->SetMP(pPlayer->GetMP() - m_statBoostAmount);
+		pPlayer->SetMaxMP(pPlayer->GetMaxMP() - m_statBoostAmount);
+		break;
+	case AT:
+		pPlayer->SetAT(pPlayer->GetAT() - m_statBoostAmount);
+		break;
+	case DF:
+		pPlayer->SetDF(pPlayer->GetDF() - m_statBoostAmount);
+		break;
+	default:
+		std::cout << "Oopsie! ";
+		break;
+	}
+
+	pPlayer->Draw();
+}
