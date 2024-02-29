@@ -15,26 +15,21 @@
 #include "LightningBolt.h"
 #include "Fireball.h"
 
-Player::Player() : Character{{0,0}, m_maxHP, 15, 5}, m_inCombat{false}
+Player::Player() : Character{{0,0}, 100, 15, 5}, m_inCombat{false}
 {
 	m_manaPoints = m_maxMP;
-	m_healthPoints = m_maxHP;
 	m_priority = PRIORITY_PLAYER;
 }
 
-Player::Player(Point2D position) : Character{ position, m_maxHP, 15, 5 }, m_inCombat{ false }
+Player::Player(Point2D position) : Character{ position, 100, 15, 5 }, m_inCombat{ false }
 {
 	m_manaPoints = m_maxMP;
-	m_healthPoints = m_maxHP;
 	m_priority = PRIORITY_PLAYER;
 }
 
 Player::~Player()
 {
-	for (auto iter = m_inventory.begin(); iter < m_inventory.end(); iter++) {
-		delete (*iter);
-	}
-	m_inventory.clear();
+	// Clear stored spell classes
 	for (auto iter = m_spells.begin(); iter < m_spells.end(); iter++) {
 		delete (*iter);
 	}
@@ -256,7 +251,7 @@ void Player::Attack(Enemy* pEnemy, Game* game, bool isRisky)
 			int damageTaken = pEnemy->Attack(this, game);
 			if (damageTaken != -1){
 				// if the attack involves taking damage, take the damage
-				m_healthPoints -= damageTaken;
+				SetHP(m_healthPoints - damageTaken);
 			}
 		}
 	}
