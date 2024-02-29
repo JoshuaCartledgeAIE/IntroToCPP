@@ -55,9 +55,6 @@ StatBooster::StatBooster(int amount, StatType type) : m_statBoostAmount{amount},
 		m_name.Prepend("Superior");
 }
 
-StatBooster::~StatBooster()
-{
-}
 
 void StatBooster::OnPickup(Player* pPlayer)
 {

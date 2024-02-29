@@ -14,11 +14,6 @@ Enemy::Enemy(Point2D pos, int HP, int AT, int DF, String name, float chance) :
 	m_priority = PRIORITY_ENEMY;
 }
 
-Enemy::~Enemy()
-{
-
-}
-
 int Enemy::OnAttacked(int damageDealt)
 {
 	int damage = damageDealt - m_defendPoints;
@@ -104,6 +99,14 @@ void Enemy::OnDeath(Game* game)
 		std::cout << "You gained " << BLUE << MPGain << "MP!" << RESET_COLOR;
 	}
 	std::cout << std::endl;
+
+	// check for possible HP gain from harvester's scythe item
+	if (game->GetPlayer()->m_gainHPOnKill) {
+		int HPGain = rand() % 5 + 1;
+		game->GetPlayer()->SetHP(game->GetPlayer()->GetHP() + HPGain);
+		std::cout << INDENT << GREEN << "You gained " << HPGain <<
+			"HP from the Harvester's Scythe!" << RESET_COLOR << std::endl;
+	}
 }
 
 

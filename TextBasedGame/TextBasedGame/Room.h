@@ -13,7 +13,7 @@ class Room
 {
 public:
 	Room();
-	~Room();
+
 	void SetPosition(Point2D position);
 	void SetType(int type) { m_type = type; }
 	int GetType() { return m_type; }

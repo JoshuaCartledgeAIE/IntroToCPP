@@ -55,8 +55,6 @@ const int CAST = 12;
 const int QUIT = 13;
 const int COMBAT_FAIL = 14;
 
-const int VISION_RANGE = 30;
-
 // Priority Values
 const int PRIORITY_DEFAULT = 5;
 const int PRIORITY_PLAYER = 0;

@@ -6,10 +6,6 @@ String("Deals a medium amount of damage to the enemy. Costs 5MP")}
 {
 }
 
-LightningBolt::~LightningBolt()
-{
-}
-
 void LightningBolt::Cast(Game* game, Player* pPlayer)
 {
 	// Deal damage to the enemy in the room

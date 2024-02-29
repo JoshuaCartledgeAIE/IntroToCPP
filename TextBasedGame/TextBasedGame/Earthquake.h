@@ -10,7 +10,6 @@ class Earthquake : public Spell
 {
 public:
 	Earthquake();
-	~Earthquake();
 
 	void Cast(Game* game, Player* pPlayer) override;
 };

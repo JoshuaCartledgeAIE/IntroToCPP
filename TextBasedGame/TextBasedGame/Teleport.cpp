@@ -8,10 +8,6 @@ String("Teleports the player to a random room. Costs 15MP") }
 {
 }
 
-Teleport::~Teleport()
-{
-}
-
 void Teleport::Cast(Game* game, Player* pPlayer)
 {
 	// Set player to random position within 3 rooms of the player

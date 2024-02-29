@@ -8,10 +8,6 @@ String("Shuffles all paths throughout the maze. Costs 10MP")}
 {
 }
 
-Shift::~Shift()
-{
-}
-
 void Shift::Cast(Game* game, Player* pPlayer)
 {
 	// Clear map display

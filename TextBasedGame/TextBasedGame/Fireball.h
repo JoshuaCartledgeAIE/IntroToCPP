@@ -9,7 +9,6 @@ class Fireball : public Spell
 {
 public:
 	Fireball();
-	~Fireball();
 
 	void Cast(Game* game, Player* pPlayer) override;
 };

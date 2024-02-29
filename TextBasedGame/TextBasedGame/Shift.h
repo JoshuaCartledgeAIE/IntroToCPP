@@ -8,7 +8,6 @@ class Shift : public Spell
 {
 public:
 	Shift();
-	~Shift();
 
 	void Cast(Game* game, Player* pPlayer) override;
 

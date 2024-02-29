@@ -12,6 +12,7 @@
 #include "BasicEnemy.h"
 #include "StatBooster.h"
 #include "Spellbook.h"
+#include "SimpleItems.h"
 
 
 Game::Game() : m_gameOver{false}
@@ -23,9 +24,11 @@ Game::~Game()
 	for (auto iter = m_items.begin(); iter < m_items.end(); iter++) {
 		delete (*iter);
 	}
+	m_items.clear();
 	for (auto iter = m_enemies.begin(); iter < m_enemies.end(); iter++) {
 		delete (*iter);
 	}
+	m_enemies.clear();
 }
 
 bool Game::Startup()
@@ -217,20 +220,11 @@ void Game::InitializeMap()
 void Game::InitializeEnemies()
 {
 	// Add a random number of enemies
-	int enemyCount = 40;
+	int enemyCount = 20;
 
 	for (int i = 0; i < enemyCount; i++) {
-
-		int x = 0;
-		int y = 0;
-		// find random unoccupied space
-		do {
-			x = rand() % (MAZE_WIDTH - 1) + 1;
-			y = rand() % (MAZE_HEIGHT - 1) + 1;
-		} while (m_map[y][x].GetEnemy() != nullptr || m_map[y][x].GetItem() != nullptr);
-
-		// Add enemy to room
-		AddEnemy({ x,y }, BASIC);
+		// Add enemy to random unoccupied room
+		AddEnemy(GetRandomEmptyPos(), BASIC);
 	}
 }
 
@@ -239,34 +233,45 @@ void Game::InitializeItems()
 	//// add a fixed number of stat booster items
 	//int itemCount = 10;
 
-	//// randomly place the items in the map
+	//// randomly place those items in the map
 	//for (int i = 0; i < itemCount; i++)
 	//{
-	//	int x = rand() % (MAZE_WIDTH - 2) + 1;
-	//	int y = rand() % (MAZE_HEIGHT - 2) + 1;
-
-	//	// dont add item to rooms with an enemy or another item
-	//	if (m_map[y][x].GetEnemy() == nullptr && m_map[y][x].GetItem() == nullptr)
-	//		AddStatItem({ x,y });
+	//  AddStatItem(GetRandomEmptyPos());
 	//}
+
+	Point2D pos = { 0,0 };
 
 	// add a spellbook for every spell
 	String spellNames[] = { "Earthquake", "Fireball", "Lightning Bolt", "Teleport" };
 	for (String spell : spellNames) {
 
-		int x = 0;
-		int y = 0;
-		// find random unoccupied space
-		do {
-			x = rand() % (MAZE_WIDTH - 2) + 1;
-			y = rand() % (MAZE_HEIGHT - 2) + 1;
-		} while (m_map[y][x].GetEnemy() != nullptr || m_map[y][x].GetItem() != nullptr);
+		pos = GetRandomEmptyPos();
 		
 		// add the spellbook to the items array and to the room
 		m_items.push_back(new Spellbook(spell));
-		m_map[y][x].AddGameObject(m_items[m_items.size() - 1]);
+		m_map[pos.y][pos.x].AddGameObject(m_items[m_items.size() - 1]);
 	}
 
+	//// Add one of each special item
+	pos = GetRandomEmptyPos();
+	// add the item to the items array and to the room
+	m_items.push_back(new LuckyClover);
+	m_map[pos.y][pos.x].AddGameObject(m_items[m_items.size() - 1]);
+
+	pos = GetRandomEmptyPos();
+	// add the item to the items array and to the room
+	m_items.push_back(new SpellcastingGuidebook);
+	m_map[pos.y][pos.x].AddGameObject(m_items[m_items.size() - 1]);
+
+	pos = GetRandomEmptyPos();
+	// add the item to the items array and to the room
+	m_items.push_back(new Torch);
+	m_map[pos.y][pos.x].AddGameObject(m_items[m_items.size() - 1]);
+
+	pos = GetRandomEmptyPos();
+	// add the item to the items array and to the room
+	m_items.push_back(new HarvestersScythe);
+	m_map[pos.y][pos.x].AddGameObject(m_items[m_items.size() - 1]);
 }
 
 void Game::GenerateTransitions()
@@ -276,16 +281,34 @@ void Game::GenerateTransitions()
 	}
 }
 
+Point2D Game::GetRandomEmptyPos()
+{
+	int x = 0;
+	int y = 0;
+	int emergencyExit = 0;
+
+	// find random unoccupied space
+	do {
+		x = rand() % MAZE_WIDTH;
+		y = rand() % MAZE_HEIGHT;
+		emergencyExit++;
+		if (emergencyExit > 1000) { return Point2D{ 1,1 }; }
+	} while (m_map[y][x].GetEnemy() != nullptr || m_map[y][x].GetItem() != nullptr
+		|| x + y <= 2 || abs(MAZE_WIDTH - x) + abs(MAZE_HEIGHT - y) <= 2);
+	
+	return Point2D{x, y};
+}
+
 void Game::UpdateRoomVisibility()
 {
 	// Get player position
 	Point2D playerPos = m_player.GetPosition();
 	Point2D position = { 0, 0 };
-	// Loop through rooms and make them visible if they are 3 rooms away from the player
+	// Loop through rooms and make them visible if they are in the vision range of the player
 	for (position.y = 0; position.y < MAZE_HEIGHT; position.y++)
 	{
 		for (position.x = 0; position.x < MAZE_WIDTH; position.x++) {
-			if (abs(playerPos.x - position.x) + abs(playerPos.y - position.y) <= VISION_RANGE)
+			if (abs(playerPos.x - position.x) + abs(playerPos.y - position.y) <= m_player.m_visionRange)
 			m_map[position.y][position.x].SetVisibility(true);
 		}
 	}
@@ -393,7 +416,7 @@ void Game::DrawCommands()
 			<< "attack" << RESET_COLOR << ": Performs a normal attack (deals damage equal to your AT stat)" << std::endl;
 		std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
 
-		std::cout << MAGENTA << "risky" << RESET_COLOR << ": Performs a risky attack (deals 2xAT damage, but 50% chance to miss)" << std::endl;
+		std::cout << MAGENTA << "risky" << RESET_COLOR << ": Performs a risky attack (deals 2xAT damage, but only a " << m_player.m_riskyHitChance * 100 << "% chance to hit)" << std::endl;
 		std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
 
 		std::cout << MAGENTA << "cast spellName" << RESET_COLOR << ": casts the named spell (see known spells below)" << std::endl;
@@ -467,9 +490,9 @@ int Game::GetCommand()
 	// jump to the correct location
 	std::cout << CSI << PLAYER_INPUT_Y << ";" << 0 << "H";
 	// clear any existing text
-	std::cout << CSI << "7M";
-	// insert 7 blank lines to ensure the inventory output remains correct
-	std::cout << CSI << "7L";
+	std::cout << CSI << "9M";
+	// insert 9 blank lines to ensure the inventory output remains correct
+	std::cout << CSI << "9L";
 
 	std::cout << INDENT << "Enter a command: ";
 	int commandNo = -1;

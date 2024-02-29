@@ -8,7 +8,6 @@ class Teleport : public Spell
 {
 public:
 	Teleport();
-	~Teleport();
 
 	void Cast(Game* game, Player* pPlayer) override;
 

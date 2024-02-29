@@ -31,10 +31,14 @@ Player::Player(Point2D position) : Character{ position, m_maxHP, 15, 5 }, m_inCo
 
 Player::~Player()
 {
-	for (auto iter = m_Items.begin(); iter < m_Items.end(); iter++) {
+	for (auto iter = m_inventory.begin(); iter < m_inventory.end(); iter++) {
 		delete (*iter);
 	}
-	m_Items.clear();
+	m_inventory.clear();
+	for (auto iter = m_spells.begin(); iter < m_spells.end(); iter++) {
+		delete (*iter);
+	}
+	m_spells.clear();
 }
 
 void Player::AddItem(Item* item)
@@ -43,11 +47,11 @@ void Player::AddItem(Item* item)
 	item->OnPickup(this);
 
 	// Don't add spellbooks to the player's inventory
-	if (item->GetName() == "Spellbook") { return; }
+	if (item->GetName().Find("Spellbook") != -1) { return; }
 
 	// Add new Item to the inventory array and sort it alphabetically
-	m_Items.push_back(item);
-	std::sort(m_Items.begin(), m_Items.end(), Item::Compare);
+	m_inventory.push_back(item);
+	std::sort(m_inventory.begin(), m_inventory.end(), Item::Compare);
 }
 
 void Player::Draw()
@@ -87,7 +91,7 @@ void Player::Draw()
 	// Draw inventory
 	std::cout << std::endl << std::endl << INDENT;
 	std::cout << YELLOW << "Inventory: " << RESET_COLOR << std::endl;
-	for (auto iter = m_Items.begin(); iter < m_Items.end(); iter++) {
+	for (auto iter = m_inventory.begin(); iter < m_inventory.end(); iter++) {
 		std::cout << INDENT << INDENT <<
 			(*iter)->GetName() << ": " << (*iter)->GetDescription() << std::endl;
 	}
@@ -198,6 +202,9 @@ void Player::Pickup(Room* pRoom)
 
 		// Clear Item from room
 		pRoom->RemoveGameObject(Item);
+
+		// Redraw player to update stats and stuff
+		Draw();
 	}
 	else {
 		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "There is nothing here to pick up." << std::endl;
@@ -215,13 +222,14 @@ void Player::Attack(Enemy* pEnemy, Game* game, bool isRisky)
 
 		int damageDealt = 0;
 		if (isRisky) {
-			if (rand() % 10 < 5) // 50% chance to hit
+			// risky attack (chance to miss, but deals high damage)
+			if ((rand() % 100) / 100.0f < m_riskyHitChance) // normally 50% chance to hit
 				damageDealt = m_attackPoints * 2 + (rand() % 8) - 4; // large variance in damage (+-4dmg)
 			else
 				std::cout << RED << "You missed your risky swing!" << std::endl;
 		}
 		else {
-			// regular attack (guaranteed hit)
+			// regular attack (guaranteed hit, normal damage)
 			damageDealt = m_attackPoints + (rand() % 4) - 2; // small variance in damage (+-2dmg)
 		}
 
@@ -304,7 +312,7 @@ void Player::CastSpell(String spellName, Game* game)
 	}
 	// Cast the spell and spend the mana
 	spell->Cast(game, this);
-	m_manaPoints -= spell->GetCost();
+	m_manaPoints -= spell->GetCost() * m_spellCostMultiplier;
 
 	// If spell was cast in combat, enemy then fights back
 	if (m_inCombat) {

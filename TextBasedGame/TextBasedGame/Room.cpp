@@ -14,11 +14,6 @@ Room::Room() : m_mapPosition{0, 0}, m_type{EMPTY}, m_isRevealed{false}
 {
 }
 
-Room::~Room()
-{
-
-}
-
 void Room::SetPosition(Point2D position)
 {
 	m_mapPosition = position;

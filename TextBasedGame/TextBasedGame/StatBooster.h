@@ -8,7 +8,6 @@ class StatBooster : public Item
 public: 
 	StatBooster();
 	StatBooster(int amount, StatType type);
-	~StatBooster();
 
 	void OnPickup(Player* pPlayer) override;
 

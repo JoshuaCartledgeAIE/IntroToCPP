@@ -11,7 +11,6 @@ class Spell
 public:
 	Spell();
 	Spell(int cost, String name, bool forCombat, String desc);
-	~Spell();
 
 	virtual void Cast(Game* game, Player* pPlayer) = 0;
 

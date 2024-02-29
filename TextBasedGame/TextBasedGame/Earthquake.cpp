@@ -5,10 +5,6 @@ String("Causes an earthquake, forming paths from this room to all surrounding ro
 {
 }
 
-Earthquake::~Earthquake()
-{
-}
-
 void Earthquake::Cast(Game* game, Player* pPlayer)
 {
 	// Adds a transition in all directions in the player's current room

@@ -8,7 +8,6 @@ class Spellbook: public Item
 public:
 	Spellbook();
 	Spellbook(String spell);
-	~Spellbook();
 
 	void OnPickup(Player* pPlayer) override;
 

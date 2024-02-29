@@ -11,7 +11,6 @@ class Enemy : public Character
 public:
 	Enemy();
 	Enemy(Point2D pos, int HP, int AT, int DF, String name, float chance);
-	~Enemy();
 
 
 	int OnAttacked(int damageDealt);

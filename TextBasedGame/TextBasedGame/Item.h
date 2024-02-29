@@ -10,7 +10,6 @@ class Item : public GameObject
 public:
 	Item();
 	Item(String name, String desc);
-	~Item();
 
 	String GetName() { return m_name; }
 	void SetName(String& str) { m_name = str; }

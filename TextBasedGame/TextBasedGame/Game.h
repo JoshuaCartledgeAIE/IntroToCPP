@@ -32,6 +32,8 @@ private:
 	
 	void GenerateTransitions();
 
+	Point2D GetRandomEmptyPos();
+
 	void UpdateRoomVisibility();
 	void DrawMap();
 	void DrawMapBorders();

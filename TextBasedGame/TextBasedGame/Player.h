@@ -48,12 +48,20 @@ public:
 
 	void ExecuteCommand(int command, Room* pRoom, String spellName, Game* game);
 
+public:
+	// variables that items interact with
+	int m_visionRange = 1;
+	float m_riskyHitChance = 0.5f;
+	float m_spellCostMultiplier = 1.0f;
+	bool m_gainHPOnKill = false;
+
 private:
 	void Pickup(Room* pRoom);
 	void Attack(Enemy* pEnemy, Game* game, bool isRisky);
 	void CastSpell(String spellName, Game* game);
 
 private:
+	std::vector<Item*> m_inventory;
 
 	float m_manaPoints;
 
@@ -63,5 +71,7 @@ private:
 	std::vector<Spell*> m_spells;
 
 	bool m_inCombat;
+
+	
 };
 

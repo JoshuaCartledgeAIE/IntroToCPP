@@ -7,10 +7,6 @@ String("Deals a large amount of damage to a single enemy. Costs 20MP")}
 
 }
 
-Fireball::~Fireball()
-{
-}
-
 void Fireball::Cast(Game* game, Player* pPlayer)
 {
 	// Deal damage to the enemy in the room

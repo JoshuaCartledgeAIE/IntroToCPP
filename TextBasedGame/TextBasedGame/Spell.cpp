@@ -9,7 +9,3 @@ Spell::Spell(int cost, String name, bool forCombat, String desc) : m_manaCost{ c
 m_name{ name }, m_forCombat{ forCombat }, m_description{desc}
 {
 }
-
-Spell::~Spell()
-{
-}

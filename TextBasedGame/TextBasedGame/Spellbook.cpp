@@ -5,14 +5,11 @@ Spellbook::Spellbook() : m_spellToLearn{String(" ")}, Item{ String("Spellbook"),
 {
 }
 
-Spellbook::Spellbook(String spell) : m_spellToLearn{spell}
+Spellbook::Spellbook(String spell) : Item{}, m_spellToLearn { spell }
 {
 	m_name = spell + String(" Spellbook");
 }
 
-Spellbook::~Spellbook()
-{
-}
 
 void Spellbook::OnPickup(Player* pPlayer)
 {

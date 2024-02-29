@@ -6,7 +6,7 @@
 Item::Item()
 {
 	m_priority = PRIORITY_ITEM;
-	m_name[0] = 0;
+	m_name = "default";
 }
 
 Item::Item(String name, String desc)
@@ -16,9 +16,6 @@ Item::Item(String name, String desc)
 	m_priority = PRIORITY_ITEM;
 }
 
-Item::~Item()
-{
-}
 
 bool Item::Compare(Item* p1, Item* p2)
 {
@@ -33,6 +30,6 @@ void Item::Draw()
 void Item::DrawDescription()
 {
 	std::cout << INDENT << "There appears to be some " << YELLOW << 
-		"treasure" << RESET_COLOR << " here.Use the 'pickup' command to grab it!" << std::endl;
+		"treasure" << RESET_COLOR << " here. Use the 'pickup' command to grab it!" << std::endl;
 }
 

@@ -1,8 +1,9 @@
 #include "BasicEnemy.h"
 #include <iostream>
 
-BasicEnemy::BasicEnemy() : Enemy{{0,0}, 40, 15, 5, String(""), 50}
+BasicEnemy::BasicEnemy() : Enemy{{0,0}, 40, 15, 5, String(""), 0.5f}
 {
+
 	// Pick a random name for this enemy
 	String names[] = { "Bat", "Slime", "Skeleton" };
 	m_name = names[rand() % 3];
@@ -20,9 +21,6 @@ BasicEnemy::BasicEnemy() : Enemy{{0,0}, 40, 15, 5, String(""), 50}
 	m_defendPoints = m_defendPoints + rand() % 3 - 1;
 }
 
-BasicEnemy::~BasicEnemy()
-{
-}
 void BasicEnemy::Draw()
 {
 	std::cout << "[" << RED << "\x94" << RESET_COLOR << "]  ";

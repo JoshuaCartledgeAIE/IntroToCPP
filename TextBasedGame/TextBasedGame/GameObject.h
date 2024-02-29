@@ -7,7 +7,6 @@ class GameObject
 public:
 	GameObject() ;
 	GameObject(Point2D pos);
-	~GameObject();
 
 	Point2D GetPosition() { return m_mapPosition; }
 	void SetPosition(Point2D pos) { m_mapPosition = pos; }

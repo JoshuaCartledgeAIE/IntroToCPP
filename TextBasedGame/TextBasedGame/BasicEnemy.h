@@ -5,7 +5,6 @@ class BasicEnemy : public Enemy
 {
 public:
 	BasicEnemy();
-	~BasicEnemy();
 
 	void Draw() override;
 
