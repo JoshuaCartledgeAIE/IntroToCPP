@@ -9,6 +9,7 @@
 #include <vector>
 #include "BasicEnemy.h"
 #include "ThiefEnemy.h"
+#include "EliteEnemy.h"
 #include "StatBooster.h"
 #include "Spellbook.h"
 #include "SimpleItems.h"
@@ -18,6 +19,7 @@ Game::Game() : m_gameOver{false}
 {
 }
 
+// Destroys the stored objects (items and enemies)
 Game::~Game()
 {
 	for (auto iter = m_items.begin(); iter < m_items.end(); iter++) {
@@ -30,6 +32,7 @@ Game::~Game()
 	m_enemies.clear();
 }
 
+// Calls all functions needed to intialize the game state.
 bool Game::Startup()
 {
 	if (!EnableVirtualTerminal()) {
@@ -54,6 +57,7 @@ bool Game::Startup()
 	return true;
 }
 
+// The main function that is run every game loop.
 void Game::Update()
 {
 	// Get player position
@@ -103,6 +107,7 @@ void Game::Update()
 	}
 }
 
+// Calls draw functions for everything on the screen
 void Game::Draw()
 {
 	// Get player position
@@ -123,11 +128,7 @@ void Game::Draw()
 	
 }
 
-bool Game::IsGameOver()
-{
-	return m_gameOver;
-}
-
+// Adds a random stat booster item to the specified position
 void Game::AddStatItem(Point2D pos)
 {
 	StatType type = (StatType)(rand() % 4);
@@ -153,8 +154,10 @@ void Game::AddStatItem(Point2D pos)
 	m_map[pos.y][pos.x].AddGameObject(m_items[m_items.size()-1]);
 }
 
+// Adds a new enemy to the maze of the specified type at the specified location
 void Game::AddEnemy(Point2D pos, EnemyType type)
 {
+	// Create new enemy object with appropriate type, add it to the enemy list
 	switch (type)
 	{
 	case BASIC:
@@ -166,6 +169,7 @@ void Game::AddEnemy(Point2D pos, EnemyType type)
 	case SUPPORT:
 		break;
 	case ELITE:
+		m_enemies.push_back(new EliteEnemy);
 		break;
 	default:
 		break;
@@ -176,6 +180,7 @@ void Game::AddEnemy(Point2D pos, EnemyType type)
 	m_map[pos.y][pos.x].AddGameObject(m_enemies[m_enemies.size() - 1]);
 }
 
+// Configures terminal to handle special sequences
 bool Game::EnableVirtualTerminal()
 {
 	// Set output mode to handle virtual terminal sequences
@@ -200,6 +205,7 @@ bool Game::EnableVirtualTerminal()
 	return true;
 }
 
+// Creates rooms in the map and generates their transitions
 void Game::InitializeMap()
 {
 	// Intitalize map room positions
@@ -217,63 +223,51 @@ void Game::InitializeMap()
 	m_map[MAZE_HEIGHT - 1][MAZE_WIDTH - 1].SetType(EXIT);
 }
 
+// Adds enemies to the map when the maze is first generated
 void Game::InitializeEnemies()
 {
-	// Add a random number of enemies
-	int enemyCount = 20;
+	// Add a specific quantity of each enemy type randomly around the maze
+	for (int i = 0; i < 15; i++) {
+		// Add enemy to random unoccupied room
+		AddEnemy(GetRandomEmptyPos(), BASIC);
+	}
 
-	for (int i = 0; i < enemyCount; i++) {
+	for (int i = 0; i < 5; i++) {
 		// Add enemy to random unoccupied room
 		AddEnemy(GetRandomEmptyPos(), THIEF);
 	}
+
+	for (int i = 0; i < 5; i++) {
+		// Add enemy to random unoccupied room
+		AddEnemy(GetRandomEmptyPos(), ELITE);
+	}
 }
 
+// Adds items to the map when the maze is first generated
 void Game::InitializeItems()
 {
-	//// add a fixed number of stat booster items
-	//int itemCount = 10;
-
-	//// randomly place those items in the map
-	//for (int i = 0; i < itemCount; i++)
-	//{
-	//  AddStatItem(GetRandomEmptyPos());
-	//}
-
-	Point2D pos = { 0,0 };
-
 	// add a spellbook for every spell
 	String spellNames[] = { "Earthquake", "Fireball", "Lightning Bolt", "Teleport" };
 	for (String spell : spellNames) {
-
-		pos = GetRandomEmptyPos();
-		
-		// add the spellbook to the items array and to the room
+		// add the spellbook to the items array
 		m_items.push_back(new Spellbook(spell));
-		m_map[pos.y][pos.x].AddGameObject(m_items[m_items.size() - 1]);
 	}
 
 	//// Add one of each special item
-	pos = GetRandomEmptyPos();
-	// add the item to the items array and to the room
 	m_items.push_back(new LuckyClover);
-	m_map[pos.y][pos.x].AddGameObject(m_items[m_items.size() - 1]);
-
-	pos = GetRandomEmptyPos();
-	// add the item to the items array and to the room
 	m_items.push_back(new SpellcastingGuidebook);
-	m_map[pos.y][pos.x].AddGameObject(m_items[m_items.size() - 1]);
-
-	pos = GetRandomEmptyPos();
-	// add the item to the items array and to the room
 	m_items.push_back(new Torch);
-	m_map[pos.y][pos.x].AddGameObject(m_items[m_items.size() - 1]);
-
-	pos = GetRandomEmptyPos();
-	// add the item to the items array and to the room
 	m_items.push_back(new HarvestersScythe);
-	m_map[pos.y][pos.x].AddGameObject(m_items[m_items.size() - 1]);
+
+	// For each item, add it to a random room in the maze
+	for (Item* item : m_items) {
+		Point2D pos = GetRandomEmptyPos();
+		m_map[pos.y][pos.x].AddGameObject(item);
+	}
+	
 }
 
+// Makes every 2nd room randomise transitions to adjacent rooms
 void Game::GenerateTransitions()
 {
 	for (int i = 0; i < MAZE_HEIGHT * MAZE_WIDTH; i += 2) {
@@ -281,6 +275,7 @@ void Game::GenerateTransitions()
 	}
 }
 
+// Returns a Point2D of a random room in the maze that is not occupied adn not near the entrance or exit
 Point2D Game::GetRandomEmptyPos()
 {
 	int x = 0;
@@ -291,14 +286,18 @@ Point2D Game::GetRandomEmptyPos()
 	do {
 		x = rand() % MAZE_WIDTH;
 		y = rand() % MAZE_HEIGHT;
-		emergencyExit++;
+		
+		emergencyExit++; // Just to make sure there are no infinite while loops!
 		if (emergencyExit > 1000) { return Point2D{ 1,1 }; }
+
 	} while (m_map[y][x].GetEnemy() != nullptr || m_map[y][x].GetItem() != nullptr
 		|| x + y <= 2 || abs(MAZE_WIDTH - x) + abs(MAZE_HEIGHT - y) <= 2);
+	// the conditions above also ensure that the position is not near the entrance or exit
 	
 	return Point2D{x, y};
 }
 
+// Updates if each room is visible based on the player's position and vision range
 void Game::UpdateRoomVisibility()
 {
 	// Get player position
@@ -314,6 +313,7 @@ void Game::UpdateRoomVisibility()
 	}
 }
 
+// Redraws each room in the map, plus the borders and help text on the side
 void Game::DrawMap()
 {
 	Point2D position = { 0, 0 };
@@ -336,6 +336,7 @@ void Game::DrawMap()
 	DrawCommands();
 }
 
+// Draws the map borders, in a color indicating what is in the player's current room
 void Game::DrawMapBorders() {
 	// set border color based on current combat state
 	String borderColor = GREY;
@@ -374,6 +375,7 @@ void Game::DrawMapBorders() {
 
 }
 
+// Draws a legend explaining what each symbol means on the map
 void Game::DrawLegend()
 {
 	// Position cursor right of map at top
@@ -403,6 +405,7 @@ void Game::DrawLegend()
 
 }
 
+// Draws a list of available commands that the player can do
 void Game::DrawCommands()
 {
 	// Position cursor right of map
@@ -442,6 +445,7 @@ void Game::DrawCommands()
 	
 }
 
+// Draws the directions in which the player can move from the current room
 void Game::DrawValidDirections()
 {
 	// reset draw colors
@@ -485,14 +489,15 @@ void Game::DrawValidDirections()
 	}
 }
 
+// Gets the user's text input and converts it into a command
 int Game::GetCommand()
 {
 	// jump to the correct location
 	std::cout << CSI << PLAYER_INPUT_Y << ";" << 0 << "H";
 	// clear any existing text
-	std::cout << CSI << "9M";
-	// insert 9 blank lines to ensure the inventory output remains correct
-	std::cout << CSI << "9L";
+	std::cout << CSI << "10M";
+	// insert blank lines to ensure the inventory output remains correct
+	std::cout << CSI << "10L";
 
 	std::cout << INDENT << "Enter a command: ";
 	int commandNo = -1;
@@ -553,6 +558,7 @@ int Game::GetCommand()
 	return commandNo;
 }
 
+// Gets the user's input during combat and converts it into a combat command
 int Game::GetCombatCommand()
 {
 	// jump to the correct location

@@ -16,7 +16,7 @@ public:
 	bool Startup();
 	void Update();
 	void Draw();
-	bool IsGameOver();
+	bool IsGameOver() { return m_gameOver; }
 
 	void AddStatItem(Point2D pos);
 	void AddEnemy(Point2D pos, EnemyType type);

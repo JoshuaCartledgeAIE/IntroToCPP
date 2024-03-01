@@ -67,7 +67,7 @@ const int PRIORITY_ITEM = 2;
 
 
 // Possible Enemy Attack Intents
-const enum EnemyAttack {WEAK, MED, STRONG, DEBUFF, STEAL, ESCAPE};
+const enum EnemyAttack {WEAK, MED, STRONG, DEBUFF, HEAL, STEAL, ESCAPE};
 
 // Different stat types (for stat booster item)
 const enum StatType {HP, MP, AT, DF};

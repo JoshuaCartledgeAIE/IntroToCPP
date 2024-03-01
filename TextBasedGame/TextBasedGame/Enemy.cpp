@@ -2,6 +2,7 @@
 #include "Character.h"
 #include "Game.h"
 #include <iostream>
+#include <algorithm>
 
 Enemy::Enemy() : Character{ {0,0}, 40, 15, 5 }, m_nextAttack{ ESCAPE }, m_seqIndex{ 0 }, m_itemDropChance{0}
 {
@@ -19,15 +20,14 @@ int Enemy::OnAttacked(int damageDealt)
 	int damage = damageDealt - m_defendPoints;
 	if (damage <= 0) damage = rand() % 10 + 1; // if DF was too high, take small random dmg
 
-	m_healthPoints -= damage;
-	if (m_healthPoints < 0) m_healthPoints = 0;
+	SetHP(m_healthPoints - damage);
 	return damage;
 }
 
-int Enemy::Attack(Player* pPlayer, Game* game)
+void Enemy::Attack(Player* pPlayer, Game* game)
 {
 	// Make sure a dead enemy doesn't attack!
-	if (!IsAlive()) { return -1; }
+	if (!IsAlive()) { return; }
 
 	int damage = 0;
 	int index = 0;
@@ -37,38 +37,52 @@ int Enemy::Attack(Player* pPlayer, Game* game)
 	case WEAK:
 		// deal low amount of damage
 		damage = m_attackPoints * 0.75f + (rand() % 4) - 2 - pPlayer->GetDF();
-		if (damage <= 0) damage = rand() % 5 + 1; // if DF was too high, deal small random dmg
+		if (damage <= 0) damage = rand() % 5 + 1; // if player's DF was too high, deal small random dmg
+		pPlayer->SetHP(pPlayer->GetHP() - damage);
+
 		// print result of attack
-		std::cout << INDENT << "The enemy hit you with a weak attack, dealing " 
+		std::cout << INDENT << "The " << m_name << " hit you with a weak attack, dealing " 
 			<< RED << damage << " damage. " << RESET_COLOR << std::endl
-			<< INDENT << "You have " << pPlayer->GetHP() - damage << "HP remaining." << std::endl;
+			<< INDENT << "You have " << pPlayer->GetHP() << "HP remaining." << std::endl;
 		break;
+
 	case MED:
 		// deal normal amount of damage
 		damage = m_attackPoints + (rand() % 4) - 2 - pPlayer->GetDF();
-		if (damage <= 0) damage = rand() % 5 + 1; // if DF was too high, deal small random dmg
+		if (damage <= 0) damage = rand() % 5 + 1; // if player's DF was too high, deal small random dmg
+		pPlayer->SetHP(pPlayer->GetHP() - damage);
+		
 		// print result of attack
-		std::cout << INDENT << "The enemy hit you with a normal attack, dealing "
+		std::cout << INDENT << "The " << m_name << " hit you with a normal attack, dealing "
 			<< RED << damage << " damage. " << RESET_COLOR << std::endl
-			<< INDENT << "You have " << pPlayer->GetHP() - damage << "HP remaining." << std::endl;
+			<< INDENT << "You have " << pPlayer->GetHP() << "HP remaining." << std::endl;
 		break;
+
 	case STRONG:
 		// deal high amount of damage
 		damage = m_attackPoints * 2 + (rand() % 4) - 2 - pPlayer->GetDF();
-		if (damage <= 0) damage = rand() % 5 + 1; // if DF was too high, deal small random dmg
-		std::cout << INDENT << "The enemy hit you with a strong attack, dealing "
+		if (damage <= 0) damage = rand() % 5 + 1; // if player's DF was too high, deal small random dmg
+		pPlayer->SetHP(pPlayer->GetHP() - damage);
+
+		// print result of attack
+		std::cout << INDENT << "The " << m_name << " hit you with a strong attack, dealing "
 			<< RED << damage << " damage. " << RESET_COLOR << std::endl
-			<< INDENT << "You have " << pPlayer->GetHP() - damage << "HP remaining." << std::endl;
+			<< INDENT << "You have " << pPlayer->GetHP() << "HP remaining." << std::endl;
 		break;
+
 	case DEBUFF:
-		damage = -1;
 		break;
+
+	case HEAL:
+		// heal this enemy a large amount
+		break;
+
 	case STEAL:
 		// pick a random item from player's inventory
-		if (pPlayer->m_inventory.size() == 0) { std::cout << INDENT << "The enemy stole nothing!" << std::endl; break; }
+		if (pPlayer->m_inventory.size() == 0) { std::cout << INDENT << "The " << m_name << " found nothing to steal!" << std::endl; break; }
 		index = rand() % pPlayer->m_inventory.size();
 		// notify player of what item was stolen
-		std::cout << INDENT << "The enemy stole your " << YELLOW 
+		std::cout << INDENT << "The " << m_name << " stole your " << YELLOW
 			<< pPlayer->m_inventory[index]->GetName() << RESET_COLOR << " from you!" << std::endl;
 		// Add it to enemy's inventory
 		m_inventory.push_back(pPlayer->m_inventory[index]);
@@ -76,24 +90,21 @@ int Enemy::Attack(Player* pPlayer, Game* game)
 		pPlayer->m_inventory[index]->OnStolen(pPlayer);
 		// Remove it from player's inventory
 		pPlayer->m_inventory.erase(pPlayer->m_inventory.begin() + index);
-		damage = -1;
 		break;
+
 	case ESCAPE:
 		// Remove this enemy from its room
 		game->GetRoom(m_mapPosition).RemoveGameObject(this);
-		std::cout << INDENT << "The enemy ran away, taking all its stolen items with it!" << std::endl;
-		damage = -1;
+		std::cout << INDENT << "The " << m_name << " ran away, taking all its stolen items with it!" << std::endl;
 		break;
+
 	default:
-		damage = -1;
 		break;
 	}
 
 	// Switch intent to the next attack in the sequence
 	m_seqIndex = (m_seqIndex + 1) % m_attackSequence.size();
 	m_nextAttack = m_attackSequence[m_seqIndex];
-
-	return damage;
 }
 
 void Enemy::OnDeath(Game* game)
@@ -125,10 +136,12 @@ void Enemy::OnDeath(Game* game)
 	}
 
 	// Return any stolen items
-	std::cout << INDENT << "Your stolen items are now returned to you:" << std::endl;
-	for (Item* item : m_inventory) {
-		game->GetPlayer()->m_inventory.push_back(item);
-		item->OnPickup(game->GetPlayer());
+	if (m_inventory.size() > 0) {
+		std::cout << INDENT << "Your stolen items are now returned to you:" << std::endl;
+		for (Item* item : m_inventory) {
+			game->GetPlayer()->m_inventory.push_back(item);
+			item->OnPickup(game->GetPlayer());
+		}
 	}
 }
 

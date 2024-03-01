@@ -1,16 +1,15 @@
-#include "ThiefEnemy.h"
-#include <iostream>
+#include "EliteEnemy.h"
 
-ThiefEnemy::ThiefEnemy() : Enemy{ {0, 0}, 35, 12, 8, String(""), 0.8f }
+EliteEnemy::EliteEnemy() : Enemy{{0,0}, 60, 20, 10, String(" "), 1.0f}
 {
 	// Pick a random name for this enemy
-	String names[] = { "Rat", "Bandit", "Poltergeist" };
+	String names[] = { "Ogre", "Golem", "Troll" };
 	m_name = names[rand() % 3];
 
 	// Pick a random attack sequence for this enemy
 	std::vector<std::vector<EnemyAttack>> sequences =
-		{ {STEAL, STEAL, ESCAPE}, {STEAL, MED, ESCAPE, },
-		{STRONG, STEAL, ESCAPE}, {STEAL, ESCAPE} };
+	{ {STRONG, WEAK, STRONG}, {WEAK, STRONG, STRONG, STRONG},
+	{MED, MED, STRONG}};
 	m_attackSequence = sequences[rand() % sequences.size()];
 	m_nextAttack = m_attackSequence[0];
 
@@ -20,7 +19,7 @@ ThiefEnemy::ThiefEnemy() : Enemy{ {0, 0}, 35, 12, 8, String(""), 0.8f }
 	m_defendPoints = m_defendPoints + rand() % 3 - 1;
 }
 
-void ThiefEnemy::Draw()
+void EliteEnemy::Draw()
 {
-	std::cout << "[" << ORANGE << "\x8B" << RESET_COLOR << "]  ";
+	std::cout << "[" << DARK_RED << "\x99" << RESET_COLOR << "]  ";
 }
