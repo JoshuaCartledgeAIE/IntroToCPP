@@ -21,7 +21,9 @@ public:
 
 	String GetDescription() { return m_description; }
 
+	// OnPickup gives the player the benefit of the item
 	virtual void OnPickup(Player* pPlayer) = 0;
+	// OnStolen reverses the benefit of the item (when enemy steals it from you)
 	virtual void OnStolen(Player* pPlayer) = 0;
 
 protected:

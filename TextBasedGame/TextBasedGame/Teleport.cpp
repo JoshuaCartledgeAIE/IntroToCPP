@@ -16,7 +16,7 @@ void Teleport::Cast(Game* game, Player* pPlayer)
 
 	pPlayer->SetPosition({newX, newY});
 
-	std::cout << EXTRA_OUTPUT_POS << MAGENTA <<
+	std::cout << EXTRA_OUTPUT_POS << BLUE <<
 		"You experience a nauseating sensation as you are suddenly dematerialized, but luckily you do snap back to reality eventually."
 		<< std::endl << INDENT << "After coming to your senses, you find yourself in a completely random room." << RESET_COLOR;
 }

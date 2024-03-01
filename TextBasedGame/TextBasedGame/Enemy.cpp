@@ -36,8 +36,7 @@ void Enemy::Attack(Player* pPlayer, Game* game)
 	{
 	case WEAK:
 		// deal low amount of damage
-		damage = m_attackPoints * 0.75f + (rand() % 4) - 2 - pPlayer->GetDF();
-		if (damage <= 0) damage = rand() % 5 + 1; // if player's DF was too high, deal small random dmg
+		damage = CalculateDamage(0.75f, pPlayer);
 		pPlayer->SetHP(pPlayer->GetHP() - damage);
 
 		// print result of attack
@@ -48,8 +47,7 @@ void Enemy::Attack(Player* pPlayer, Game* game)
 
 	case MED:
 		// deal normal amount of damage
-		damage = m_attackPoints + (rand() % 4) - 2 - pPlayer->GetDF();
-		if (damage <= 0) damage = rand() % 5 + 1; // if player's DF was too high, deal small random dmg
+		damage = CalculateDamage(1.0f, pPlayer);
 		pPlayer->SetHP(pPlayer->GetHP() - damage);
 		
 		// print result of attack
@@ -60,8 +58,7 @@ void Enemy::Attack(Player* pPlayer, Game* game)
 
 	case STRONG:
 		// deal high amount of damage
-		damage = m_attackPoints * 2 + (rand() % 4) - 2 - pPlayer->GetDF();
-		if (damage <= 0) damage = rand() % 5 + 1; // if player's DF was too high, deal small random dmg
+		damage = CalculateDamage(1.5f, pPlayer);
 		pPlayer->SetHP(pPlayer->GetHP() - damage);
 
 		// print result of attack
@@ -183,5 +180,15 @@ void Enemy::DrawDescription()
 		
 		
 	std::cout << RESET_COLOR << " next turn." << std::endl;
+}
+
+float Enemy::CalculateDamage(float multiplier, Player* pPlayer)
+{
+	// Calculate damage, multipled by multiplier, with a bit of variance, minus player's defence
+	float damage = m_attackPoints * multiplier + (rand() % 4) - 2 - pPlayer->GetDF();
+	if (damage <= 0) damage = rand() % 5 + 1; // if player's DF was too high, deal small random dmg
+	damage -= pPlayer->GetBlock();
+	if (damage <= 0) damage = 0;
+	return damage;
 }
 

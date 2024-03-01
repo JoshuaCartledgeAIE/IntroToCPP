@@ -96,6 +96,9 @@
     <ClCompile Include="EliteEnemy.cpp">
       <Filter>Source Files\Enemies</Filter>
     </ClCompile>
+    <ClCompile Include="IceShield.cpp">
+      <Filter>Source Files\Spells</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Character.h">
@@ -163,6 +166,9 @@
     </ClInclude>
     <ClInclude Include="EliteEnemy.h">
       <Filter>Header Files\Enemies</Filter>
+    </ClInclude>
+    <ClInclude Include="IceShield.h">
+      <Filter>Header Files\Spells</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

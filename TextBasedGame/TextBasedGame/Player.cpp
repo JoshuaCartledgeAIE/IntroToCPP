@@ -11,6 +11,7 @@
 #include "Game.h"
 #include "LightningBolt.h"
 #include "Fireball.h"
+#include "IceShield.h"
 
 Player::Player() : Character{{0,0}, 100, 15, 5}, m_inCombat{false}
 {
@@ -119,6 +120,10 @@ void Player::LearnSpell(String spellName)
 	}
 	else if (spellName == "Fireball") {
 		Fireball* spell = new Fireball;
+		m_spells.push_back(spell);
+	}
+	else if (spellName == "Ice Shield") {
+		IceShield* spell = new IceShield;
 		m_spells.push_back(spell);
 	}
 	else {
@@ -311,6 +316,9 @@ void Player::CastSpell(String spellName, Game* game)
 	if (m_inCombat) {
 		game->GetRoom(m_mapPosition).GetEnemy()->Attack(this, game);
 	}
+
+	// Reset player's block to 0 after being attacked (from Ice Shield spell)
+	m_block = 0;
 
 	// Redraw game and player to update any changes that the spells made
 	game->Draw();

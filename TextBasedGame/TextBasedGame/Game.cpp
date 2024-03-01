@@ -51,7 +51,7 @@ bool Game::Startup()
 
 	// Set player to start pos
 	m_player.SetPosition(Point2D{ 0,0 });
-	// Have player learn first spell
+	// Have player learn first spell (Shift)
 	m_player.LearnSpell(String("Shift"));
 
 	return true;
@@ -247,7 +247,8 @@ void Game::InitializeEnemies()
 void Game::InitializeItems()
 {
 	// add a spellbook for every spell
-	String spellNames[] = { "Earthquake", "Fireball", "Lightning Bolt", "Teleport" };
+	String spellNames[] = { "Earthquake", "Fireball", "Lightning Bolt", 
+		"Teleport", "Ice Shield"};
 	for (String spell : spellNames) {
 		// add the spellbook to the items array
 		m_items.push_back(new Spellbook(spell));

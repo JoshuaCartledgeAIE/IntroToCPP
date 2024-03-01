@@ -18,6 +18,8 @@ void SpellcastingGuidebook::OnStolen(Player* pPlayer)
 	pPlayer->m_spellCostMultiplier = 1.0f;
 }
 
+
+
 Torch::Torch()
 {
 	m_name = String("Torch");
@@ -35,6 +37,8 @@ void Torch::OnStolen(Player* pPlayer)
 	pPlayer->m_visionRange = 1;
 }
 
+
+
 LuckyClover::LuckyClover()
 {
 	m_name = String("Lucky Clover");
@@ -51,6 +55,8 @@ void LuckyClover::OnStolen(Player* pPlayer)
 {
 	pPlayer->m_riskyHitChance = 0.5f;
 }
+
+
 
 HarvestersScythe::HarvestersScythe()
 {

@@ -20,6 +20,9 @@ public:
 	void DrawDescription() override;
 
 protected:
+	float CalculateDamage(float multiplier, Player* pPlayer);
+
+protected:
 	String m_name;
 	EnemyAttack m_nextAttack;
 	int m_seqIndex;

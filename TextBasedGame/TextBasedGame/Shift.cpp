@@ -23,6 +23,6 @@ void Shift::Cast(Game* game, Player* pPlayer)
 		game->GetRoom((int)(i / MAZE_WIDTH), i % MAZE_WIDTH).RandomiseTransitions(game);
 	}
 
-	std::cout << EXTRA_OUTPUT_POS << MAGENTA << 
+	std::cout << EXTRA_OUTPUT_POS << BLUE << 
 		"You feel the pathways through the maze shift and change around you." << RESET_COLOR;
 }

@@ -128,6 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="EliteEnemy.cpp" />
+    <ClCompile Include="IceShield.cpp" />
     <ClCompile Include="SimpleItems.cpp" />
     <ClCompile Include="BasicEnemy.cpp" />
     <ClCompile Include="Character.cpp" />
@@ -151,6 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EliteEnemy.h" />
+    <ClInclude Include="IceShield.h" />
     <ClInclude Include="SimpleItems.h" />
     <ClInclude Include="BasicEnemy.h" />
     <ClInclude Include="Character.h" />

@@ -24,6 +24,9 @@ public:
 	float GetMP() { return m_manaPoints; }
 	float GetMaxMP() { return m_maxMP; }
 
+	float GetBlock(){ return m_block; }
+	void SetBlock(float block) { m_block = block; }
+
 	// Setters involving values with maximums should ensure that they stay under those maximums
 	void SetMaxMP(float value) { m_maxMP = value; if (m_manaPoints > m_maxMP) m_manaPoints = m_maxMP;}
 	void SetMP(float value) { m_manaPoints = value; if (m_manaPoints > m_maxMP) m_manaPoints = m_maxMP; }
@@ -60,6 +63,6 @@ private:
 
 	bool m_inCombat;
 
-	
+	int m_block = 0;
 };
 

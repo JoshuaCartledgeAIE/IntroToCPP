@@ -13,7 +13,7 @@ void Earthquake::Cast(Game* game, Player* pPlayer)
 	for (int i = 0; i < 4; i++)
 		room.AddTransition(i, game, true);
 
-	std::cout << EXTRA_OUTPUT_POS << MAGENTA <<
+	std::cout << EXTRA_OUTPUT_POS << BLUE <<
 		"You feel a jarring tremble beneath your feet, and see several new tunnels open up around you." << RESET_COLOR;
 		
 }
