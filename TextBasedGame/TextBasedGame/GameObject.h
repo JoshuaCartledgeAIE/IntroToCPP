@@ -1,6 +1,5 @@
 #pragma once
 #include "GameDefines.h"
-#include "Point2D.h"
 
 class GameObject
 {

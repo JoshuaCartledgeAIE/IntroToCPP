@@ -1,8 +1,5 @@
 #include "Player.h"
 #include "GameDefines.h"
-#include <iostream>
-#include "Point2D.h"
-#include "String.h"
 #include <vector>
 #include "Enemy.h"
 #include <algorithm>
@@ -15,14 +12,14 @@
 #include "LightningBolt.h"
 #include "Fireball.h"
 
-Player::Player() : Character{{0,0}, m_maxHP, 15, 5}, m_inCombat{false}
+Player::Player() : Character{{0,0}, 100, 15, 5}, m_inCombat{false}
 {
 	m_manaPoints = m_maxMP;
 	m_healthPoints = m_maxHP;
 	m_priority = PRIORITY_PLAYER;
 }
 
-Player::Player(Point2D position) : Character{ position, m_maxHP, 15, 5 }, m_inCombat{ false }
+Player::Player(Point2D position) : Character{ position, 100, 15, 5 }, m_inCombat{ false }
 {
 	m_manaPoints = m_maxMP;
 	m_healthPoints = m_maxHP;
@@ -256,7 +253,7 @@ void Player::Attack(Enemy* pEnemy, Game* game, bool isRisky)
 			int damageTaken = pEnemy->Attack(this, game);
 			if (damageTaken != -1){
 				// if the attack involves taking damage, take the damage
-				m_healthPoints -= damageTaken;
+				SetHP(m_healthPoints - damageTaken);
 			}
 		}
 	}
@@ -316,7 +313,12 @@ void Player::CastSpell(String spellName, Game* game)
 
 	// If spell was cast in combat, enemy then fights back
 	if (m_inCombat) {
-		game->GetRoom(m_mapPosition).GetEnemy()->Attack(this, game);
+		Enemy* pEnemy = game->GetRoom(m_mapPosition).GetEnemy();
+		int damageTaken = pEnemy->Attack(this, game);
+		if (damageTaken != -1) {
+			// if the attack involves taking damage, take the damage
+			SetHP(m_healthPoints - damageTaken);
+		}
 	}
 
 	// Redraw game and player to update any changes that the spells made

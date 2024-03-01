@@ -1,13 +1,5 @@
-#include <iostream>
-#include <windows.h>
-#include <time.h>
-#include <random>
-#include "String.h"
-#include "Point2D.h"
 #include "GameDefines.h"
 #include "Game.h"
-#include "Player.h"
-#include "Room.h"
 
 int main() {
 

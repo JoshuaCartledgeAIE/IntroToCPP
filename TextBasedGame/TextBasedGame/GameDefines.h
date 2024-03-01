@@ -1,4 +1,8 @@
 #pragma once
+// Important includes that are used by basically everything
+#include "Point2D.h"
+#include "String.h"
+#include <iostream>
 
 const char * const ESC = "\x1b";
 const char * const CSI = "\x1b[";

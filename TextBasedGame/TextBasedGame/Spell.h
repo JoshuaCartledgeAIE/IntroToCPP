@@ -1,5 +1,4 @@
 #pragma once
-#include "String.h"
 #include "GameDefines.h"
 
 class Room;

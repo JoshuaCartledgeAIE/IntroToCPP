@@ -4,7 +4,6 @@
 #include "Player.h"
 #include "Game.h"
 #include "Enemy.h"
-#include <iostream>
 
 class Earthquake : public Spell
 {

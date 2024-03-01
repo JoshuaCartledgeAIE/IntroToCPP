@@ -4,8 +4,6 @@
 #include "Player.h"
 #include <Windows.h>
 #include <time.h>
-#include <iostream>
-#include "String.h"
 #include "Enemy.h"
 #include "Item.h"
 #include <vector>
