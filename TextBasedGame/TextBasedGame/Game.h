@@ -24,6 +24,8 @@ public:
 	Room& GetRoom(Point2D pos) { return m_map[pos.y][pos.x]; }
 	Player* GetPlayer() { return &m_player; }
 
+	int m_target;
+
 private:
 	bool EnableVirtualTerminal();
 	void InitializeMap();

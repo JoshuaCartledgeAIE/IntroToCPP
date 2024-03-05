@@ -9,9 +9,9 @@
 #include "Teleport.h"
 #include "Earthquake.h"
 #include "Game.h"
-#include "LightningBolt.h"
+#include "Lightning.h"
 #include "Fireball.h"
-#include "IceShield.h"
+#include "Aegis.h"
 
 Player::Player() : Character{{0,0}, 100, 15, 5}, m_inCombat{false}
 {
@@ -114,16 +114,16 @@ void Player::LearnSpell(String spellName)
 		Earthquake* spell = new Earthquake;
 		m_spells.push_back(spell);
 	}
-	else if (spellName == "Lightning Bolt") {
-		LightningBolt* spell = new LightningBolt;
+	else if (spellName == "Lightning") {
+		Lightning* spell = new Lightning;
 		m_spells.push_back(spell);
 	}
 	else if (spellName == "Fireball") {
 		Fireball* spell = new Fireball;
 		m_spells.push_back(spell);
 	}
-	else if (spellName == "Ice Shield") {
-		IceShield* spell = new IceShield;
+	else if (spellName == "Aegis") {
+		Aegis* spell = new Aegis;
 		m_spells.push_back(spell);
 	}
 	else {
@@ -134,7 +134,7 @@ void Player::LearnSpell(String spellName)
 	std::sort(m_spells.begin(), m_spells.end(), Spell::Compare);
 }
 
-void Player::ExecuteCommand(int command, Room* pRoom, String spellName, Game* game)
+void Player::ExecuteCommand(int command, Room* pRoom, String spellName, int target, Game* game)
 {
 	std::vector<int> transitions = pRoom->GetTransitions();
 
@@ -162,10 +162,10 @@ void Player::ExecuteCommand(int command, Room* pRoom, String spellName, Game* ga
 		}
 		return;
 	case NORMAL_ATTACK:
-		Attack(pRoom->GetEnemy(), game, false);
+		Attack(pRoom->GetEnemies(), game, false);
 		break;
 	case RISKY_ATTACK:
-		Attack(pRoom->GetEnemy(), game, true);
+		Attack(pRoom->GetEnemies(), game, true);
 		break;
 	case PICKUP:
 		Pickup(pRoom);
@@ -213,14 +213,20 @@ void Player::Pickup(Room* pRoom)
 	}
 }
 
-void Player::Attack(Enemy* pEnemy, Game* game, bool isRisky)
+void Player::Attack(std::vector<Enemy*> enemies, Game* game, bool isRisky)
 {
-
-	if (pEnemy == nullptr) {
+	
+	if (enemies.size() == 0) {
 		std::cout << EXTRA_OUTPUT_POS << RESET_COLOR << "There is no one here to fight." << std::endl;
 	}
 	else {
 		std::cout << EXTRA_OUTPUT_POS;
+
+		int target = game->m_target - 1;
+		if (target < 0 || target >= enemies.size()) {
+			std::cout << RED << "Invalid target!" << RESET_COLOR << std::endl;
+			return;
+		}
 
 		int damageDealt = 0;
 		if (isRisky) {
@@ -237,44 +243,99 @@ void Player::Attack(Enemy* pEnemy, Game* game, bool isRisky)
 
 		// Tell enemy to take damage from the attack
 		if (damageDealt > 0) {
-			int actualDmgDealt = pEnemy->OnAttacked(damageDealt);
+			int actualDmgDealt = enemies[target]->OnAttacked(damageDealt);
 			// Report how much damage was dealt and enemy's remaining health
 			std::cout << RESET_COLOR <<
-				"You hit the enemy, dealing " << YELLOW << actualDmgDealt <<
+				"You hit the " << enemies[target]->GetName() << ", dealing " << YELLOW << actualDmgDealt <<
 				" damage." << RESET_COLOR << std::endl;
 			
-			if (pEnemy->IsAlive())
-				std::cout << INDENT << "The enemy has " << pEnemy->GetHP() <<
-				" health remaining." << std::endl;
+			if (enemies[target]->IsAlive())
+				std::cout << INDENT << "The " << enemies[target]->GetName() << 
+				" has " << enemies[target]->GetHP() << " health remaining." << std::endl;
 		}
 
 
 		// If enemy dies, tell the player
-		if (pEnemy->IsAlive() == false) {
-			pEnemy->OnDeath(game);
+		if (enemies[target]->IsAlive() == false) {
+			enemies[target]->OnDeath(game);
 		}
-		else {
-			// Otherwise the enemy does their chosen attack intent
+
+		// Then each enemy does their chosen attack intent in retaliation
+		for(Enemy* pEnemy : enemies)
 			pEnemy->Attack(this, game);
-		}
 	}
 }
 
 void Player::CastSpell(String spellName, Game* game)
 {
+	// Run binary search to check if this spell is known
+	Spell* spell = SearchForSpell(spellName);
+
+	// check if spell was not found in spellbook
+	if (spell == nullptr) { 
+		std::cout << EXTRA_OUTPUT_POS << RED <<
+			"You don't know how to cast '" << spellName << "'." << RESET_COLOR << std::endl;
+		return; 
+	}
+
+	// If program reaches here, the spell exists, therefore attempt to cast it
+	// Check if spell is appropriate for the current state (combat or utility)
+	if (spell->IsForCombat() != m_inCombat) {
+		std::cout << EXTRA_OUTPUT_POS << RED <<
+			"Now is not the time to use that spell!" << RESET_COLOR << std::endl;
+		return;
+	}
+
+	// Check if player has enough mana to cast the spell
+	if (m_manaPoints < spell->GetCost()) {
+		// Spell failed to cast (not enough mana)
+		std::cout << EXTRA_OUTPUT_POS << RED <<
+			"You dont have enough MP to cast that spell!" << RESET_COLOR << std::endl;
+		return;
+	}
+
+	// When casting Fireball, ensure the target is valid before casting the spell
+	int target = game->m_target - 1;
+	if (spellName == String("fireball") && 
+		(target < 0 || target >= game->GetRoom(m_mapPosition).GetEnemies().size())) {
+		std::cout << EXTRA_OUTPUT_POS << RED << "Invalid target for Fireball!" << RESET_COLOR << std::endl;
+		return;
+	}
+
+	// Cast the spell and spend the mana
+	spell->Cast(game, this);
+	m_manaPoints -= spell->GetCost() * m_spellCostMultiplier;
+
+	// If spell was cast in combat, each enemy then fights back
+	if (m_inCombat) {
+		for (Enemy* pEnemy : game->GetRoom(m_mapPosition).GetEnemies())
+			pEnemy->Attack(this, game);
+	}
+
+	// Reset player's block to 0 after being attacked (from Ice Shield spell)
+	m_block = 0;
+
+	// Redraw game and player to update any changes that the spells made
+	game->Draw();
+	Draw(); // to update the player position and mana points
+
+	std::cout << std::endl;
+	return;
+}
+
+Spell* Player::SearchForSpell(String spellName)
+{
 	// Binary Search for spellName in spellbook
 	int leftBound = 0;
 	int rightBound = m_spells.size() - 1;
-	Spell* spell = nullptr;
-	
+
 	while (leftBound <= rightBound) {
 		// set mid index to be in the middle of the left and right bounds
 		int mid = (int)((leftBound + rightBound) / 2);
 
 		// check if the middle spell name is the one we are looking for
 		if (spellName == m_spells[mid]->GetName().ToLower()) {
-			spell = m_spells[mid];
-			break;
+			return m_spells[mid];
 		}
 
 		// adjust left/right bounds based on if spellName comes before or after current middle value
@@ -287,45 +348,8 @@ void Player::CastSpell(String spellName, Game* game)
 		}
 	}
 
-	// check if spell was not found in spellbook
-	if (spell == nullptr) { 
-		std::cout << EXTRA_OUTPUT_POS << RED <<
-			"You don't know how to cast '" << spellName << "'." << RESET_COLOR << std::endl;
-		return; 
-	}
-
-	// If program reaches here, the spell exists, therefore attempt to cast it
-	// Check if spell is for the current state (combat or utility)
-	if (spell->IsForCombat() != m_inCombat) {
-		std::cout << EXTRA_OUTPUT_POS << RED <<
-			"Now is not the time to use that spell!" << RESET_COLOR << std::endl;
-		return;
-	}
-	// Check if player has enough mana first
-	if (m_manaPoints < spell->GetCost()) {
-		// Spell failed to cast (not enough mana)
-		std::cout << EXTRA_OUTPUT_POS << RED <<
-			"You dont have enough MP to cast that spell!" << RESET_COLOR << std::endl;
-		return;
-	}
-	// Cast the spell and spend the mana
-	spell->Cast(game, this);
-	m_manaPoints -= spell->GetCost() * m_spellCostMultiplier;
-
-	// If spell was cast in combat, enemy then fights back
-	if (m_inCombat) {
-		game->GetRoom(m_mapPosition).GetEnemy()->Attack(this, game);
-	}
-
-	// Reset player's block to 0 after being attacked (from Ice Shield spell)
-	m_block = 0;
-
-	// Redraw game and player to update any changes that the spells made
-	game->Draw();
-	Draw(); // to update the player position and mana points
-
-	std::cout << std::endl;
-	return;
+	// spell was not found, therefore return nullptr
+	return nullptr;
 }
 
 

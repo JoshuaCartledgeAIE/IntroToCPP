@@ -128,7 +128,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="EliteEnemy.cpp" />
-    <ClCompile Include="IceShield.cpp" />
+    <ClCompile Include="Aegis.cpp" />
     <ClCompile Include="SimpleItems.cpp" />
     <ClCompile Include="BasicEnemy.cpp" />
     <ClCompile Include="Character.cpp" />
@@ -137,7 +137,7 @@
     <ClCompile Include="Fireball.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
-    <ClCompile Include="LightningBolt.cpp" />
+    <ClCompile Include="Lightning.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Item.cpp" />
     <ClCompile Include="Room.cpp" />
@@ -152,7 +152,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="EliteEnemy.h" />
-    <ClInclude Include="IceShield.h" />
+    <ClInclude Include="Aegis.h" />
     <ClInclude Include="SimpleItems.h" />
     <ClInclude Include="BasicEnemy.h" />
     <ClInclude Include="Character.h" />
@@ -162,7 +162,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameDefines.h" />
     <ClInclude Include="GameObject.h" />
-    <ClInclude Include="LightningBolt.h" />
+    <ClInclude Include="Lightning.h" />
     <ClInclude Include="Player.h" />
     <ClInclude Include="Point2D.h" />
     <ClInclude Include="Item.h" />

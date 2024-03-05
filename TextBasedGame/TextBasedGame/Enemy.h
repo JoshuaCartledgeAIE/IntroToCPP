@@ -10,6 +10,7 @@ public:
 	Enemy();
 	Enemy(Point2D pos, int HP, int AT, int DF, String name, float chance);
 
+	String GetName() { return m_name; }
 
 	int OnAttacked(int damageDealt);
 	void Attack(Player* pPlayer, Game* game);

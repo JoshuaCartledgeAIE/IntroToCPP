@@ -11,10 +11,13 @@ const char * const CSI = "\x1b[";
 const char * const TITLE = "\x1b[1;35H";
 const char * const INDENT = "\x1b[5C";
 const char * const RESET_COLOR = "\x1b[0m";
+const char * const SAVE_CURSOR_POS = "\x1b[s";
+const char * const RESTORE_CURSOR_POS = "\x1b[u";
 const char * const STATS_OUTPUT_POS = "\x1b[2;6H";
 const char * const MAP_OUTPUT_POS = "\x1b[3;6H";
 const char * const EXTRA_OUTPUT_POS = "\x1b[23;6H";
-const char * const INVENTORY_OUTPUT_POS = "\x1b[31;6H";
+const char * const INVENTORY_OUTPUT_POS = "\x1b[35;6H";
+
 
 // Colors
 const char * const YELLOW = "\x1b[38;5;228m";

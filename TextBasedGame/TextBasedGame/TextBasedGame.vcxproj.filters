@@ -63,7 +63,7 @@
     <ClCompile Include="Teleport.cpp">
       <Filter>Source Files\Spells</Filter>
     </ClCompile>
-    <ClCompile Include="LightningBolt.cpp">
+    <ClCompile Include="Lightning.cpp">
       <Filter>Source Files\Spells</Filter>
     </ClCompile>
     <ClCompile Include="Enemy.cpp">
@@ -96,7 +96,7 @@
     <ClCompile Include="EliteEnemy.cpp">
       <Filter>Source Files\Enemies</Filter>
     </ClCompile>
-    <ClCompile Include="IceShield.cpp">
+    <ClCompile Include="Aegis.cpp">
       <Filter>Source Files\Spells</Filter>
     </ClCompile>
   </ItemGroup>
@@ -143,7 +143,7 @@
     <ClInclude Include="BasicEnemy.h">
       <Filter>Header Files\Enemies</Filter>
     </ClInclude>
-    <ClInclude Include="LightningBolt.h">
+    <ClInclude Include="Lightning.h">
       <Filter>Header Files\Spells</Filter>
     </ClInclude>
     <ClInclude Include="Fireball.h">
@@ -167,7 +167,7 @@
     <ClInclude Include="EliteEnemy.h">
       <Filter>Header Files\Enemies</Filter>
     </ClInclude>
-    <ClInclude Include="IceShield.h">
+    <ClInclude Include="Aegis.h">
       <Filter>Header Files\Spells</Filter>
     </ClInclude>
   </ItemGroup>

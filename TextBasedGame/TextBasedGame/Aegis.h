@@ -1,9 +1,9 @@
 #pragma once
 #include "Spell.h"
-class IceShield : public Spell
+class Aegis : public Spell
 {
 public: 
-    IceShield();
+    Aegis();
 
     void Cast(Game* game, Player* pPlayer) override;
 };

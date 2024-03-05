@@ -5,10 +5,10 @@
 #include "Game.h"
 #include "Enemy.h"
 
-class LightningBolt : public Spell
+class Lightning : public Spell
 {
 public:
-	LightningBolt();
+	Lightning();
 
 	void Cast(Game* game, Player* pPlayer) override;
 };

@@ -53,6 +53,9 @@ bool Game::Startup()
 	m_player.SetPosition(Point2D{ 0,0 });
 	// Have player learn first spell (Shift)
 	m_player.LearnSpell(String("Shift"));
+	m_player.LearnSpell(String("Fireball"));
+	m_player.LearnSpell(String("Lightning"));
+	m_player.LearnSpell(String("Aegis"));
 
 	return true;
 }
@@ -87,7 +90,7 @@ void Game::Update()
 	}
 
 	// Execute the command
-	m_player.ExecuteCommand(command, &m_map[playerPos.y][playerPos.x], m_spellName, this);
+	m_player.ExecuteCommand(command, &m_map[playerPos.y][playerPos.x], m_spellName, m_target, this);
 	
 	// If there are any dead enemies, remove them from their room
 	for (int i = 0; i < m_enemies.size(); i++) {
@@ -99,7 +102,7 @@ void Game::Update()
 
 	// check if player is in a room with an enemy
 	playerPos = m_player.GetPosition();
-	if (m_map[playerPos.y][playerPos.x].GetEnemy() != nullptr) {
+	if (m_map[playerPos.y][playerPos.x].GetEnemies().size() > 0) {
 		m_player.SetCombatState(true);
 	}
 	else {
@@ -157,19 +160,26 @@ void Game::AddStatItem(Point2D pos)
 // Adds a new enemy to the maze of the specified type at the specified location
 void Game::AddEnemy(Point2D pos, EnemyType type)
 {
+	int enemyCount = m_map[pos.y][pos.x].GetEnemies().size();
+	int chanceToAddExtraEnemy = 0;
+
 	// Create new enemy object with appropriate type, add it to the enemy list
 	switch (type)
 	{
 	case BASIC:
 		m_enemies.push_back(new BasicEnemy);
+		chanceToAddExtraEnemy = 30;
 		break;
 	case THIEF:
 		m_enemies.push_back(new ThiefEnemy);
+		chanceToAddExtraEnemy = 40;
 		break;
 	case SUPPORT:
+		chanceToAddExtraEnemy = 70;
 		break;
 	case ELITE:
 		m_enemies.push_back(new EliteEnemy);
+		chanceToAddExtraEnemy = 20;
 		break;
 	default:
 		break;
@@ -178,6 +188,10 @@ void Game::AddEnemy(Point2D pos, EnemyType type)
 	// Tell the enemy its position and tell the room it contains an enemy
 	m_enemies[m_enemies.size()-1]->SetPosition(pos);
 	m_map[pos.y][pos.x].AddGameObject(m_enemies[m_enemies.size() - 1]);
+
+	// Potentially add more enemies to the encounter
+	if (enemyCount < 3 && rand() % 100 < chanceToAddExtraEnemy)
+		AddEnemy(pos, (EnemyType)(rand() % 2));
 }
 
 // Configures terminal to handle special sequences
@@ -227,18 +241,18 @@ void Game::InitializeMap()
 void Game::InitializeEnemies()
 {
 	// Add a specific quantity of each enemy type randomly around the maze
-	for (int i = 0; i < 15; i++) {
-		// Add enemy to random unoccupied room
+	for (int i = 0; i < 10; i++) {
+		// Add basic enemy to random unoccupied room
 		AddEnemy(GetRandomEmptyPos(), BASIC);
 	}
 
 	for (int i = 0; i < 5; i++) {
-		// Add enemy to random unoccupied room
+		// Add thief enemy to random unoccupied room
 		AddEnemy(GetRandomEmptyPos(), THIEF);
 	}
 
 	for (int i = 0; i < 5; i++) {
-		// Add enemy to random unoccupied room
+		// Add elite enemy to random unoccupied room
 		AddEnemy(GetRandomEmptyPos(), ELITE);
 	}
 }
@@ -246,9 +260,14 @@ void Game::InitializeEnemies()
 // Adds items to the map when the maze is first generated
 void Game::InitializeItems()
 {
+	// add a set number of stat booster items
+	for (int i = 0; i < 5; i++) {
+		AddStatItem(GetRandomEmptyPos());
+	}
+
 	// add a spellbook for every spell
-	String spellNames[] = { "Earthquake", "Fireball", "Lightning Bolt", 
-		"Teleport", "Ice Shield"};
+	String spellNames[] = { "Earthquake", "Fireball", "Lightning", 
+		"Teleport", "Aegis"};
 	for (String spell : spellNames) {
 		// add the spellbook to the items array
 		m_items.push_back(new Spellbook(spell));
@@ -291,7 +310,7 @@ Point2D Game::GetRandomEmptyPos()
 		emergencyExit++; // Just to make sure there are no infinite while loops!
 		if (emergencyExit > 1000) { return Point2D{ 1,1 }; }
 
-	} while (m_map[y][x].GetEnemy() != nullptr || m_map[y][x].GetItem() != nullptr
+	} while (m_map[y][x].GetEnemies().size() > 0 || m_map[y][x].GetItem() != nullptr
 		|| x + y <= 2 || abs(MAZE_WIDTH - x) + abs(MAZE_HEIGHT - y) <= 2);
 	// the conditions above also ensure that the position is not near the entrance or exit
 	
@@ -416,11 +435,11 @@ void Game::DrawCommands()
 
 	// Depending on if player is in combat, write available commands
 	if (m_player.IsInCombat()) {
-		std::cout << MAGENTA << "normal" << RESET_COLOR << " OR " << MAGENTA
-			<< "attack" << RESET_COLOR << ": Performs a normal attack (deals damage equal to your AT stat)" << std::endl;
+		std::cout << MAGENTA << "normal <enemyNum>" << RESET_COLOR << " OR " << MAGENTA
+			<< "attack <enemyNum>" << RESET_COLOR << ": Performs a normal attack (deals damage equal to your AT stat)" << std::endl;
 		std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
 
-		std::cout << MAGENTA << "risky" << RESET_COLOR << ": Performs a risky attack (deals 2xAT damage, but only a " << m_player.m_riskyHitChance * 100 << "% chance to hit)" << std::endl;
+		std::cout << MAGENTA << "risky <enemyNum>" << RESET_COLOR << ": Performs a risky attack (deals 2xAT damage, but only a " << m_player.m_riskyHitChance * 100 << "% chance to hit)" << std::endl;
 		std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
 
 		std::cout << MAGENTA << "cast spellName" << RESET_COLOR << ": casts the named spell (see known spells below)" << std::endl;
@@ -496,9 +515,9 @@ int Game::GetCommand()
 	// jump to the correct location
 	std::cout << CSI << PLAYER_INPUT_Y << ";" << 0 << "H";
 	// clear any existing text
-	std::cout << CSI << "10M";
+	std::cout << CSI << "12M";
 	// insert blank lines to ensure the inventory output remains correct
-	std::cout << CSI << "10L";
+	std::cout << CSI << "12L";
 
 	std::cout << INDENT << "Enter a command: ";
 	int commandNo = -1;
@@ -565,9 +584,9 @@ int Game::GetCombatCommand()
 	// jump to the correct location
 	std::cout << CSI << PLAYER_INPUT_Y << ";" << 0 << "H";
 	// clear any existing text
-	std::cout << CSI << "7M";
-	// insert 7 blank lines to ensure the inventory output remains correct
-	std::cout << CSI << "7L";
+	std::cout << CSI << "12M";
+	// insert blank lines to ensure the inventory output remains correct
+	std::cout << CSI << "12L";
 
 	std::cout << INDENT << "Enter a command: ";
 	int commandNo = -1;
@@ -583,18 +602,29 @@ int Game::GetCombatCommand()
 	inputCommand = inputCommand.ToLower();
 	m_spellName = "";
 
-
 	// Determine which command has been entered
 	if (inputCommand.Find("normal") == 0 || inputCommand.Find("normal attack") == 0
 		|| inputCommand.Find("attack") == 0) {
 		commandNo = NORMAL_ATTACK;
+		// get target index by removing everything else from the command
+		inputCommand.Replace("normal", "");
+		inputCommand.Replace("attack", "");
+		inputCommand.Replace(" ", "");
+		m_target = strtol(inputCommand, NULL, 10);
 	}
 	else if (inputCommand.Find("risky") == 0 || inputCommand.Find("risky attack") == 0) {
 		commandNo = RISKY_ATTACK;
 	}
 	else if (inputCommand.Find("cast") == 0) {
 		commandNo = CAST;
-		m_spellName = inputCommand.Substring(5, inputCommand.Length());
+		inputCommand.Append(" "); // so that the find " " below works even if player just types "cast fireball"
+		// get name of spell being cast
+		m_spellName = inputCommand.Substring(5, inputCommand.Find(6, " "));
+		// get target index by removing everything else from the command
+		inputCommand.Replace("cast", "");
+		inputCommand.Replace(m_spellName, "");
+		inputCommand.Replace(" ", "");
+		m_target = strtol(inputCommand, NULL, 10);
 	}
 	else if (inputCommand.Find("exit") == 0) {
 		commandNo = QUIT;
@@ -602,6 +632,9 @@ int Game::GetCombatCommand()
 	else {
 		commandNo = COMBAT_FAIL;
 	}
+
+	// default target is first enemy
+	if (m_target == 0) m_target = 1;
 
 	return commandNo;
 }

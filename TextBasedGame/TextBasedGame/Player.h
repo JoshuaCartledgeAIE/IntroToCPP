@@ -39,7 +39,7 @@ public:
 
 	void LearnSpell(String spellName);
 
-	void ExecuteCommand(int command, Room* pRoom, String spellName, Game* game);
+	void ExecuteCommand(int command, Room* pRoom, String spellName, int target, Game* game);
 
 public:
 	// variables that items interact with
@@ -50,8 +50,10 @@ public:
 
 private:
 	void Pickup(Room* pRoom);
-	void Attack(Enemy* pEnemy, Game* game, bool isRisky);
+	void Attack(std::vector<Enemy*> enemies, Game* game, bool isRisky);
 	void CastSpell(String spellName, Game* game);
+
+	Spell* SearchForSpell(String spellName);
 
 private:
 

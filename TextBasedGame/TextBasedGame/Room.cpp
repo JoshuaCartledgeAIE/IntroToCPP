@@ -98,16 +98,29 @@ void Room::DrawDescription()
 	std::cout << RESET_COLOR;
 	// jump to the correct location
 	std::cout << CSI << ROOM_DESC_Y << ";" << 0 << "H";
-	// Delete 2 lines and insert 2 empty lines
-	std::cout << CSI << "2M" << CSI << "2L" << std::endl;
+	// Delete 3 lines and insert 3 empty lines
+	std::cout << CSI << "3M" << CSI << "3L" << std::endl;
 	// write description of current room
 	switch (m_type) {
 	case EMPTY:
 		if (m_objects.size() > 0) {
-			m_objects[0]->DrawDescription();
+			std::vector<Enemy*> enemies = GetEnemies();
+			if (enemies.size() > 0){
+				// There are enemies in the room, therefore draw each one's description
+				std::cout << INDENT << "You stumble upon an enemy encounter!" << std::endl << INDENT;
+				for (int i = 0; i < enemies.size(); i++) {
+					std::cout << "(Enemy " << i+1 << ": ";
+					enemies[i]->DrawDescription();
+				}
+				std::cout << std::endl;
+			}
+			else {
+				// There must only be items in the room
+				m_objects[0]->DrawDescription();
+			}
 		}
 		else {
-			// empty room
+			// The room is empty
 			std::cout << INDENT << "You are in an empty room. There is nothing of note here." << std::endl;
 		}
 		break;
@@ -120,18 +133,22 @@ void Room::DrawDescription()
 	}
 }
 
-Enemy* Room::GetEnemy()
+std::vector<Enemy*> Room::GetEnemies()
 {
+	std::vector<Enemy*> enemies;
+	// find each enemy in the room and add it to the vector
 	for (GameObject* obj : m_objects) {
 		Enemy* enemy = dynamic_cast<Enemy*>(obj);
 		if (enemy != nullptr)
-			return enemy;
+			enemies.push_back(enemy);
 	}
-	return nullptr;
+
+	return enemies; // will return empty vector if no enemies are found
 }
 
 Item* Room::GetItem()
 {
+	// Find the first item in the room and return it, otherwise return nullptr
 	for (GameObject* obj : m_objects) {
 		Item* item = dynamic_cast<Item*>(obj);
 		if (item != nullptr)

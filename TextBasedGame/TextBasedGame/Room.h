@@ -23,7 +23,7 @@ public:
 	void Draw();
 	void DrawDescription();
 
-	Enemy* GetEnemy();
+	std::vector<Enemy*> GetEnemies();
 	Item* GetItem();
 
 	void RandomiseTransitions(Game* game);

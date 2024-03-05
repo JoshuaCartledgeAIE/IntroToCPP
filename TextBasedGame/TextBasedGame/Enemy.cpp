@@ -31,6 +31,10 @@ void Enemy::Attack(Player* pPlayer, Game* game)
 
 	int damage = 0;
 	int index = 0;
+
+	// Every message starts with "The <enemyname>"
+	std::cout << INDENT << "The " << YELLOW << m_name << " " << RESET_COLOR;
+	
 	// Act on attack intent
 	switch (m_nextAttack)
 	{
@@ -40,9 +44,9 @@ void Enemy::Attack(Player* pPlayer, Game* game)
 		pPlayer->SetHP(pPlayer->GetHP() - damage);
 
 		// print result of attack
-		std::cout << INDENT << "The " << m_name << " hit you with a weak attack, dealing " 
-			<< RED << damage << " damage. " << RESET_COLOR << std::endl
-			<< INDENT << "You have " << pPlayer->GetHP() << "HP remaining." << std::endl;
+		std::cout << "hit you with a weak attack, dealing " <<
+			RED << damage << " damage, " << RESET_COLOR <<
+			"and leaving you with " << GREEN << pPlayer->GetHP() << "HP remaining." << RESET_COLOR << std::endl;
 		break;
 
 	case MED:
@@ -51,9 +55,9 @@ void Enemy::Attack(Player* pPlayer, Game* game)
 		pPlayer->SetHP(pPlayer->GetHP() - damage);
 		
 		// print result of attack
-		std::cout << INDENT << "The " << m_name << " hit you with a normal attack, dealing "
-			<< RED << damage << " damage. " << RESET_COLOR << std::endl
-			<< INDENT << "You have " << pPlayer->GetHP() << "HP remaining." << std::endl;
+		std::cout << "hit you with a normal attack, dealing " <<
+			RED << damage << " damage, " << RESET_COLOR << 
+			"and leaving you with " << GREEN << pPlayer->GetHP() << "HP remaining." << RESET_COLOR << std::endl;
 		break;
 
 	case STRONG:
@@ -62,9 +66,9 @@ void Enemy::Attack(Player* pPlayer, Game* game)
 		pPlayer->SetHP(pPlayer->GetHP() - damage);
 
 		// print result of attack
-		std::cout << INDENT << "The " << m_name << " hit you with a strong attack, dealing "
-			<< RED << damage << " damage. " << RESET_COLOR << std::endl
-			<< INDENT << "You have " << pPlayer->GetHP() << "HP remaining." << std::endl;
+		std::cout << "hit you with a strong attack, dealing " << 
+			RED << damage << " damage, " << RESET_COLOR <<
+			"and leaving you with " << GREEN << pPlayer->GetHP() << "HP remaining." << RESET_COLOR << std::endl;
 		break;
 
 	case DEBUFF:
@@ -76,10 +80,10 @@ void Enemy::Attack(Player* pPlayer, Game* game)
 
 	case STEAL:
 		// pick a random item from player's inventory
-		if (pPlayer->m_inventory.size() == 0) { std::cout << INDENT << "The " << m_name << " found nothing to steal!" << std::endl; break; }
+		if (pPlayer->m_inventory.size() == 0) { std::cout << "found nothing to steal!" << std::endl; break; }
 		index = rand() % pPlayer->m_inventory.size();
 		// notify player of what item was stolen
-		std::cout << INDENT << "The " << m_name << " stole your " << YELLOW
+		std::cout << "stole your " << YELLOW
 			<< pPlayer->m_inventory[index]->GetName() << RESET_COLOR << " from you!" << std::endl;
 		// Add it to enemy's inventory
 		m_inventory.push_back(pPlayer->m_inventory[index]);
@@ -92,11 +96,17 @@ void Enemy::Attack(Player* pPlayer, Game* game)
 	case ESCAPE:
 		// Remove this enemy from its room
 		game->GetRoom(m_mapPosition).RemoveGameObject(this);
-		std::cout << INDENT << "The " << m_name << " ran away, taking all its stolen items with it!" << std::endl;
+		std::cout << "ran away, taking all its stolen items with it!" << std::endl;
 		break;
 
 	default:
 		break;
+	}
+
+	// If player was killed as a result of this attack, print lose message
+	if (!pPlayer->IsAlive()) {
+		std::cout << INDENT << RED << "YOU HAVE BEEN KILLED. GAME OVER." << std::endl;
+		exit(0);
 	}
 
 	// Switch intent to the next attack in the sequence
@@ -134,52 +144,54 @@ void Enemy::OnDeath(Game* game)
 
 	// Return any stolen items
 	if (m_inventory.size() > 0) {
-		std::cout << INDENT << "Your stolen items are now returned to you:" << std::endl;
+
+		std::cout << SAVE_CURSOR_POS << INDENT << YELLOW <<
+			"Your stolen items are now returned to you:" << RESET_COLOR << std::endl;
 		for (Item* item : m_inventory) {
 			game->GetPlayer()->m_inventory.push_back(item);
+			std::cout << INDENT;
 			item->OnPickup(game->GetPlayer());
 		}
+
+		// Go back to the output area
+		std::cout << RESTORE_CURSOR_POS << CSI << m_inventory.size() + 1 << "B";
+
 	}
 }
 
 
 void Enemy::DrawDescription()
 {
-	// Delete 2 lines and insert 2 line
-	std::cout << CSI << "2M" << CSI << "2L";
-
-	// Print enemy's name and HP
-	std::cout << INDENT  << "You stumble upon a vicious " << RED << m_name << RESET_COLOR << " that has " << m_healthPoints << "HP." << std::endl;
+	// Print summarised description of enemy's stats
 	
-	// Print enemy's attack intent
-	std::cout << INDENT << "The " << RED << m_name << RESET_COLOR << " intends to " << YELLOW;
+	std::cout << m_name << ")  " << GREEN << m_healthPoints << "HP" 
+		<< RESET_COLOR << "  Intent: " << YELLOW;
 
 	switch (m_nextAttack) {
 	case WEAK:
-		std::cout << "perform a weak attack";
+		std::cout << "weak attack";
 		break;
 	case MED:
-		std::cout << "perform an average attack";
+		std::cout << "average attack";
 		break;
 	case STRONG:
-		std::cout << "perform a strong attack";
+		std::cout << "strong attack";
 		break;
 	case DEBUFF:
-		std::cout << "apply a temporary debuff to you";
+		std::cout << "weaken player";
 		break;
 	case STEAL:
-		std::cout << "steal one of your items";
+		std::cout << "steal item";
 		break;
 	case ESCAPE:
-		std::cout << "run away with its stolen loot";
+		std::cout << "run away";
 		break;
 	default:
-		std::cout << "do something? I can't tell what though";
+		std::cout << "error";
 		break;
 	}
 		
-		
-	std::cout << RESET_COLOR << " next turn." << std::endl;
+	std::cout << RESET_COLOR << "     ";
 }
 
 float Enemy::CalculateDamage(float multiplier, Player* pPlayer)
@@ -188,7 +200,15 @@ float Enemy::CalculateDamage(float multiplier, Player* pPlayer)
 	float damage = m_attackPoints * multiplier + (rand() % 4) - 2 - pPlayer->GetDF();
 	if (damage <= 0) damage = rand() % 5 + 1; // if player's DF was too high, deal small random dmg
 	damage -= pPlayer->GetBlock();
-	if (damage <= 0) damage = 0;
+	
+	if (damage <= 0) {
+		// reduce block by blocked amount
+		pPlayer->SetBlock(-damage);
+		damage = 0;
+	}
+	else {
+		pPlayer->SetBlock(0);
+	}
 	return damage;
 }
 
