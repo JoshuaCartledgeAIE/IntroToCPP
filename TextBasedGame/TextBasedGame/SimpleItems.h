@@ -37,4 +37,3 @@ public:
 	void OnPickup(Player* pPlayer) override;
 	void OnStolen(Player* pPlayer) override;
 };
-

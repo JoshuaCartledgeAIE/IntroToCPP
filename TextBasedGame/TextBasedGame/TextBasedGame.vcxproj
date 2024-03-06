@@ -146,6 +146,7 @@
     <ClCompile Include="Spellbook.cpp" />
     <ClCompile Include="StatBooster.cpp" />
     <ClCompile Include="String.cpp" />
+    <ClCompile Include="SupportEnemy.cpp" />
     <ClCompile Include="Teleport.cpp" />
     <ClCompile Include="TextBasedGame.cpp" />
     <ClCompile Include="ThiefEnemy.cpp" />
@@ -172,6 +173,7 @@
     <ClInclude Include="Spellbook.h" />
     <ClInclude Include="StatBooster.h" />
     <ClInclude Include="String.h" />
+    <ClInclude Include="SupportEnemy.h" />
     <ClInclude Include="Teleport.h" />
     <ClInclude Include="ThiefEnemy.h" />
   </ItemGroup>

@@ -39,8 +39,9 @@ void Lightning::Cast(Game* game, Player* pPlayer)
 
 	// Tell player about any killed enemies
 	for (Enemy* pEnemy : enemies) {
-		if (!pEnemy->IsAlive())
-			std::cout << GREEN << "You killed the " << pEnemy->GetName() << "!" << RESET_COLOR << std::endl;
+		if (!pEnemy->IsAlive()) {
+			pEnemy->OnDeath(game);
+		}
 	}
 		 
 }
