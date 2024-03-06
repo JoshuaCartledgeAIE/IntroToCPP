@@ -32,11 +32,11 @@ const char * const GREY = "\x1b[38;5;243m";
 
 // room types
 const int EMPTY = 0;
-const int ENTRANCE = EMPTY + 1;
+const int ENTRANCE = EMPTY + 1; 
 const int EXIT = ENTRANCE + 1;
 
-const int WINDOW_HEIGHT = 60;
-const int WINDOW_WIDTH = 200;
+const int WINDOW_HEIGHT = 80;
+const int WINDOW_WIDTH = 220;
 
 const int MAZE_WIDTH = 15;
 const int MAZE_HEIGHT = 7;

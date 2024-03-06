@@ -32,7 +32,9 @@ public:
 	void SetMP(float value) { m_manaPoints = value; if (m_manaPoints > m_maxMP) m_manaPoints = m_maxMP; }
 
 	bool IsInCombat() { return m_inCombat; }
-	void SetCombatState(bool combat) { m_inCombat = combat; }
+	void SetCombatState(bool combat) {
+		m_inCombat = combat; if (!m_inCombat) m_debuffDamageMultiplier = 1.0f; // clear debuff at end of combat
+	}
 
 	void Draw() override;
 	void DrawDescription() override;
@@ -47,6 +49,7 @@ public:
 	float m_riskyHitChance = 0.5f;
 	float m_spellCostMultiplier = 1.0f;
 	bool m_gainHPOnKill = false;
+	float m_debuffDamageMultiplier = 1.0f;
 
 private:
 	void Pickup(Room* pRoom);

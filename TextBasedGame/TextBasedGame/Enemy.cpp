@@ -72,10 +72,19 @@ void Enemy::Attack(Player* pPlayer, Game* game)
 		break;
 
 	case DEBUFF:
+		// reduce player's damage for this combat
+		pPlayer->m_debuffDamageMultiplier = 0.75f;
+		std::cout << "cast a debilitating spell on you, " <<
+			MAGENTA << "lowering your attack damage for this combat." << RESET_COLOR << std::endl;
 		break;
 
 	case HEAL:
-		// heal this enemy a large amount
+		// heal the whole enemy team a medium amount
+		for (Enemy* enemy : game->GetRoom(m_mapPosition).GetEnemies()) {
+			enemy->SetHP(enemy->GetHP() + rand() % 5 + 10);
+		}
+		std::cout << "raised its staff and " <<
+			GREEN << "healed the entire enemy team by a medium amount." << RESET_COLOR << std::endl;
 		break;
 
 	case STEAL:
@@ -179,6 +188,9 @@ void Enemy::DrawDescription()
 		break;
 	case DEBUFF:
 		std::cout << "weaken player";
+		break;
+	case HEAL:
+		std::cout << "heal allies";
 		break;
 	case STEAL:
 		std::cout << "steal item";

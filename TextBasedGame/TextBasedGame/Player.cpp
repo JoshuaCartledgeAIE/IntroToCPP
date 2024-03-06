@@ -232,13 +232,13 @@ void Player::Attack(std::vector<Enemy*> enemies, Game* game, bool isRisky)
 		if (isRisky) {
 			// risky attack (chance to miss, but deals high damage)
 			if ((rand() % 100) / 100.0f < m_riskyHitChance) // normally 50% chance to hit
-				damageDealt = m_attackPoints * 2 + (rand() % 8) - 4; // large variance in damage (+-4dmg)
+				damageDealt = m_attackPoints * 2 * m_debuffDamageMultiplier + (rand() % 8) - 4; // large variance in damage (+-4dmg)
 			else
 				std::cout << RED << "You missed your risky swing!" << std::endl;
 		}
 		else {
 			// regular attack (guaranteed hit, normal damage)
-			damageDealt = m_attackPoints + (rand() % 4) - 2; // small variance in damage (+-2dmg)
+			damageDealt = m_attackPoints * m_debuffDamageMultiplier + (rand() % 4) - 2; // small variance in damage (+-2dmg)
 		}
 
 		// Tell enemy to take damage from the attack

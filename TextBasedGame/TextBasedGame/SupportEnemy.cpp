@@ -1,16 +1,15 @@
-#include "BasicEnemy.h"
-#include <iostream>
+#include "SupportEnemy.h"
 
-BasicEnemy::BasicEnemy() : Enemy{{0,0}, 40, 15, 5, String(""), 0.5f}
+SupportEnemy::SupportEnemy() : Enemy{ {0,0}, 35, 10, 5, String(""), 0.5f }
 {
 	// Pick a random name for this enemy
-	String names[] = { "Bat", "Slime", "Skeleton" };
-	m_name = names[rand() % 3];
+	String names[] = { "Orc Wizard", "Goblin Shaman" };
+	m_name = names[rand() % 2];
 
 	// Pick a random attack sequence for this enemy
-	std::vector<std::vector<EnemyAttack>> sequences = 
-		{ {WEAK, STRONG, WEAK}, {WEAK, WEAK, STRONG, STRONG}, 
-		{MED, MED, STRONG}, {WEAK, MED, STRONG} };
+	std::vector<std::vector<EnemyAttack>> sequences =
+	{ {DEBUFF, MED, HEAL}, {WEAK, HEAL, MED},
+	{MED, DEBUFF, HEAL}};
 	m_attackSequence = sequences[rand() % sequences.size()];
 	m_nextAttack = m_attackSequence[0];
 
@@ -20,7 +19,7 @@ BasicEnemy::BasicEnemy() : Enemy{{0,0}, 40, 15, 5, String(""), 0.5f}
 	m_defendPoints = m_defendPoints + rand() % 3 - 1;
 }
 
-void BasicEnemy::Draw()
+void SupportEnemy::Draw()
 {
 	std::cout << "[" << RED << "\x94" << RESET_COLOR << "]  ";
 }

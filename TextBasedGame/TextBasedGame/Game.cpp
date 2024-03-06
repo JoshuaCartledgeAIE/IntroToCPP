@@ -9,13 +9,14 @@
 #include <vector>
 #include "BasicEnemy.h"
 #include "ThiefEnemy.h"
+#include "SupportEnemy.h"
 #include "EliteEnemy.h"
 #include "StatBooster.h"
 #include "Spellbook.h"
 #include "SimpleItems.h"
 
 
-Game::Game() : m_gameOver{false}
+Game::Game() : m_gameOver{false}, m_target{-1}
 {
 }
 
@@ -51,11 +52,8 @@ bool Game::Startup()
 
 	// Set player to start pos
 	m_player.SetPosition(Point2D{ 0,0 });
-	// Have player learn first spell (Shift)
+	// Have player learn first spell (Shift), so they can't get stuck early
 	m_player.LearnSpell(String("Shift"));
-	m_player.LearnSpell(String("Fireball"));
-	m_player.LearnSpell(String("Lightning"));
-	m_player.LearnSpell(String("Aegis"));
 
 	return true;
 }
@@ -160,7 +158,6 @@ void Game::AddStatItem(Point2D pos)
 // Adds a new enemy to the maze of the specified type at the specified location
 void Game::AddEnemy(Point2D pos, EnemyType type)
 {
-	int enemyCount = m_map[pos.y][pos.x].GetEnemies().size();
 	int chanceToAddExtraEnemy = 0;
 
 	// Create new enemy object with appropriate type, add it to the enemy list
@@ -175,7 +172,8 @@ void Game::AddEnemy(Point2D pos, EnemyType type)
 		chanceToAddExtraEnemy = 40;
 		break;
 	case SUPPORT:
-		chanceToAddExtraEnemy = 70;
+		m_enemies.push_back(new SupportEnemy);
+		chanceToAddExtraEnemy = 100; // support enemies should never be alone
 		break;
 	case ELITE:
 		m_enemies.push_back(new EliteEnemy);
@@ -189,9 +187,10 @@ void Game::AddEnemy(Point2D pos, EnemyType type)
 	m_enemies[m_enemies.size()-1]->SetPosition(pos);
 	m_map[pos.y][pos.x].AddGameObject(m_enemies[m_enemies.size() - 1]);
 
+	int enemyCount = m_map[pos.y][pos.x].GetEnemies().size();
 	// Potentially add more enemies to the encounter
 	if (enemyCount < 3 && rand() % 100 < chanceToAddExtraEnemy)
-		AddEnemy(pos, (EnemyType)(rand() % 2));
+		AddEnemy(pos, (EnemyType)(rand() % 3));
 }
 
 // Configures terminal to handle special sequences
@@ -241,14 +240,19 @@ void Game::InitializeMap()
 void Game::InitializeEnemies()
 {
 	// Add a specific quantity of each enemy type randomly around the maze
-	for (int i = 0; i < 10; i++) {
+	for (int i = 0; i < 12; i++) {
 		// Add basic enemy to random unoccupied room
 		AddEnemy(GetRandomEmptyPos(), BASIC);
 	}
 
-	for (int i = 0; i < 5; i++) {
+	for (int i = 0; i < 7; i++) {
 		// Add thief enemy to random unoccupied room
 		AddEnemy(GetRandomEmptyPos(), THIEF);
+	}
+
+	for (int i = 0; i < 7; i++) {
+		// Add support enemy to random unoccupied room
+		AddEnemy(GetRandomEmptyPos(), SUPPORT);
 	}
 
 	for (int i = 0; i < 5; i++) {
@@ -436,7 +440,7 @@ void Game::DrawCommands()
 	// Depending on if player is in combat, write available commands
 	if (m_player.IsInCombat()) {
 		std::cout << MAGENTA << "normal <enemyNum>" << RESET_COLOR << " OR " << MAGENTA
-			<< "attack <enemyNum>" << RESET_COLOR << ": Performs a normal attack (deals damage equal to your AT stat)" << std::endl;
+			<< "attack <enemyNum>" << RESET_COLOR << ": Performs a normal attack on the specified enemy" << std::endl;
 		std::cout << CSI << MAZE_WIDTH * 5 + 10 << "C";
 
 		std::cout << MAGENTA << "risky <enemyNum>" << RESET_COLOR << ": Performs a risky attack (deals 2xAT damage, but only a " << m_player.m_riskyHitChance * 100 << "% chance to hit)" << std::endl;
@@ -614,6 +618,11 @@ int Game::GetCombatCommand()
 	}
 	else if (inputCommand.Find("risky") == 0 || inputCommand.Find("risky attack") == 0) {
 		commandNo = RISKY_ATTACK;
+		// get target index by removing everything else from the command
+		inputCommand.Replace("risky", "");
+		inputCommand.Replace("attack", "");
+		inputCommand.Replace(" ", "");
+		m_target = strtol(inputCommand, NULL, 10);
 	}
 	else if (inputCommand.Find("cast") == 0) {
 		commandNo = CAST;
